@@ -1,0 +1,38 @@
+name: Crear Sitio IIS
+description: Crea un sitio IIS con la configuración especificada.
+inputs:
+  site_name:
+    description: "Nombre del sitio IIS"
+    required: true
+  app_pool_name:
+    description: "Nombre del Application Pool asociado al sitio"
+    required: true
+  physical_path:
+    description: "Ruta física del sitio (ejemplo: C:\\inetpub\\wwwroot\\mysite)"
+    required: true
+  host_header:
+    description: "Encabezado del sitio (ejemplo: http, https)"
+    required: true
+  port:
+    description: "Puerto en el que se escuchará el sitio (ejemplo: 80)"
+    required: true
+  servidor_remoto:
+    description: "Nombre o dirección IP del servidor remoto donde se creará el sitio"
+    required: true
+  usuario:
+    description: "Usuario para conectarse al servidor remoto"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Crear Sitio IIS en servidor remoto
+      shell: pwsh
+      run: |
+        $scriptContent = Get-Content -Path ".\create-iis-site.ps1" -Raw
+        $session = New-PSSession -HostName "${{ inputs.servidor_remoto }}" -UserName "${{ inputs.usuario }}"
+        Invoke-Command -Session $session -ScriptBlock {
+          param($script, $siteName, $physicalPath, $hostHeader, $port, $appPoolName)
+          Invoke-Expression $script
+        } -ArgumentList $scriptContent, "${{ inputs.site_name }}", "${{ inputs.physical_path }}", "${{ inputs.host_header }}", "${{ inputs.port }}", "${{ inputs.app_pool_name }}"
+        Remove-PSSession $session
+        echo "Sitio IIS '${{ inputs.site_name }}' creado en el servidor remoto."

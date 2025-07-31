@@ -1,0 +1,63 @@
+name: Orquestador de despliegue de aplicaciones
+on:
+  workflow_call:
+    inputs:
+      rama:
+        description: 'Rama a desplegar - Permite saber si desplegaremos en producción (rama main) o en desarrollo (rama develop)'
+        required: true
+        type: string
+      tecnologia:
+        description: 'Tecnología a desplegar'
+        required: true
+        type: string
+      requiere_compilar:
+        description: 'Indica si se requiere compilación'
+        required: true
+        type: boolean
+      despliegue_en:
+        description: 'Entorno de despliegue'
+        required: true
+        type: string
+    secrets: inherit
+
+jobs:
+  build:
+    runs-on: self-hosted
+    if: ${{ inputs.requiere_compilar == 'true' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Información del entorno a compilar
+        run: |
+          echo "Rama: ${{ inputs.rama }}"
+          echo "Tecnología: ${{ inputs.tecnologia }}"
+      - name: build
+        uses: ./.github/actions/build/${{ inputs.tecnologia }}
+
+  test:
+    runs-on: self-hosted
+    if: ${{ inputs.requiere_compilar == 'true' }}
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Información del entorno a testear
+        run: |
+          echo "Rama: ${{ inputs.rama }}"
+          echo "Tecnología: ${{ inputs.tecnologia }}"
+      - name: test
+        uses: ./.github/actions/test/${{ inputs.tecnologia }}
+
+  deploy:
+    runs-on: self-hosted
+    needs: [build, test]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Información del entorno a desplegar
+        run: |
+          echo "Rama: ${{ inputs.rama }}"
+          echo "Tecnología: ${{ inputs.tecnologia }}"
+          echo "Despliegue en: ${{ inputs.despliegue_en }}"
+      - name: deploy
+        uses: ./.github/actions/deploy/${{ inputs.tecnologia }}

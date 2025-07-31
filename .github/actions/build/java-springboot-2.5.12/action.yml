@@ -1,0 +1,16 @@
+name: Action para compilar aplicaciones Java Spring Boot 2.5.12
+description: 'Esta acción compila aplicaciones Java Spring Boot 2.5.12'
+runs:
+  using: 'composite'
+  steps:
+    - name: Compilar aplicación Java Spring Boot 2.5.12
+      run: |
+        echo "Compilando aplicación Java Spring Boot 2.5.12..."
+        mvn clean package -DskipTests
+        echo "Compilación completada."
+      shell: powershell
+    # - name: Subir artefactos
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: java-springboot-2.5.12
+    #     path: target/*.jar | target/*.war

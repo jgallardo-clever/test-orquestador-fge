@@ -1,0 +1,47 @@
+name: Disparador de orquestador
+on:
+  workflow_dispatch:
+    inputs:
+      rama:
+        description: 'Rama del repositorio'
+        required: true
+        type: choice
+        options:
+          - 'main'
+          - 'develop'
+      tecnologia:
+        description: 'Tecnología a utilizar'
+        required: true
+        type: choice
+        options:
+          - 'java-springboot-2.5.12'
+          - 'net-framework-4.6'
+          - 'net-framework-4.7'
+          - 'net-framework-4.8'
+          - 'php-laravel'
+          - 'nodejs-nestjs'
+          - 'nodejs-reactjs'
+          - 'nodejs-angularjs'
+      requiere_compilar:
+        description: '¿Requiere compilar?'
+        required: true
+        type: boolean
+      despliegue_en:
+        description: 'Entorno de despliegue'
+        required: true
+        type: choice
+        options:
+          - 'IIS'
+          - 'AKS'
+
+jobs:
+  run-orquestador:
+    runs-on: self-hosted
+    steps:
+      - name: Llamar al workflow orquestador
+        uses: ./.github/workflows/orquestador.yml
+        with:
+          rama: ${{ github.event.inputs.rama }}
+          tecnologia: ${{ github.event.inputs.tecnologia }}
+          requiere_compilar: ${{ github.event.inputs.requiere_compilar }}
+          despliegue_en: ${{ github.event.inputs.despliegue_en }}

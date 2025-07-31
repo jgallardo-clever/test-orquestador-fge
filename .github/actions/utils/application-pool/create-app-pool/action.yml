@@ -1,0 +1,35 @@
+name: Crear App Pool de IIS
+description: 'Esta acción crea un Application Pool en IIS'
+inputs:
+  app_pool_name:
+    description: 'Nombre del Application Pool a crear'
+    required: true
+  managed_runtime_version:
+    description: 'Versión de .NET Framework para el Application Pool'
+    required: true
+    default: 'v4.0'
+  managed_pipeline_mode:
+    description: 'Modo de canalización administrada para el Application Pool'
+    required: true
+    default: 'Integrated'
+  servidor_remoto:
+    description: 'Nombre o dirección IP del servidor remoto donde se creará el Application Pool'
+    required: true
+  usuario:
+    description: 'Usuario para conectarse al servidor remoto'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Crear App Pool
+      run: |
+        echo "Creando App Pool de IIS..."
+        $scriptContent = Get-Content -Path ".\create-app-pool.ps1" -Raw
+        $session = New-PSSession -HostName "${{ inputs.servidor_remoto }}" -UserName "${{ inputs.usuario }}"
+        Invoke-Command -Session $session -ScriptBlock {
+          param($script, $appPoolName, $managedRuntimeVersion, $managedPipelineMode)
+          Invoke-Expression $script
+        } -ArgumentList $scriptContent, "${{ inputs.app_pool_name }}", "${{ inputs.managed_runtime_version }}", "${{ inputs.managed_pipeline_mode }}"
+        Remove-PSSession $session
+        echo "App Pool de IIS creado."
+      shell: powershell
