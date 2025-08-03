@@ -24,6 +24,10 @@ jobs:
   build:
     runs-on: self-hosted
     if: ${{ inputs.requiere_compilar == 'true' }}
+    outputs:
+      app_name: ${{ steps.build.outputs.app_name }}
+      version: ${{ steps.build.outputs.version }}
+      extension: ${{ steps.build.outputs.extension }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -31,8 +35,11 @@ jobs:
         run: |
           echo "Rama: ${{ inputs.rama }}"
           echo "Tecnología: ${{ inputs.tecnologia }}"
-      - name: build
+      - name: Build
         uses: ./.github/actions/build/${{ inputs.tecnologia }}
+        with:
+          server_ip: ${{ secrets.SERVER_IP }}
+          remote_user: ${{ secrets.REMOTE_USER }}
 
   test:
     runs-on: self-hosted
@@ -59,5 +66,13 @@ jobs:
           echo "Rama: ${{ inputs.rama }}"
           echo "Tecnología: ${{ inputs.tecnologia }}"
           echo "Despliegue en: ${{ inputs.despliegue_en }}"
-      - name: deploy
+      - name: Deploy Java Spring Boot 2.5.12
+        if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
         uses: ./.github/actions/deploy/${{ inputs.tecnologia }}
+        with:
+          server_ip: ${{ secrets.SERVER_IP }}
+          remote_user: ${{ secrets.REMOTE_USER }}
+          tomcat_path: ${{ secrets.TOMCAT_PATH }}
+          app_name: ${{ needs.build.outputs.app_name }}
+          version: ${{ needs.build.outputs.version }}
+          extension: ${{ needs.build.outputs.extension }}

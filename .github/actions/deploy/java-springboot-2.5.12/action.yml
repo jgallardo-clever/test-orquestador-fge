@@ -1,9 +1,6 @@
 name: Action para desplegar aplicaciones Java Spring Boot 2.5.12
 description: 'Esta acción despliega aplicaciones Java Spring Boot 2.5.12'
 inputs:
-  app_name:
-    description: 'Nombre de la aplicación a desplegar'
-    required: true
   server_ip:
     description: 'Dirección IP del servidor donde se desplegará la aplicación'
     required: true
@@ -13,29 +10,22 @@ inputs:
   tomcat_path:
     description: 'Ruta de instalación de Tomcat en el servidor remoto'
     required: true
+  app_name:
+    description: 'Nombre de la aplicación a desplegar'
+    required: true
+  version:
+    description: 'Versión de la aplicación a desplegar'
+    required: true
+  extension:
+    description: 'Extensión del artefacto a desplegar (ejemplo: war)'
+    required: true
 runs:
   using: 'composite'
   steps:
-    - name: Desplegar aplicación Java Spring Boot 2.5.12
-      run: |
-        echo "Desplegando aplicación Java Spring Boot 2.5.12..."
-        # Aquí iría el comando para desplegar la aplicación
-        echo "Despliegue completado."
-      shell: powershell
-    # - name: Descargar artefactos
-    #   uses: actions/download-artifact@v2
-    #   with:
-    #     name: java-springboot-2.5.12
-    - name: Subir artefacto al servidor remoto
-      run: |
-        echo "Subiendo artefacto al servidor remoto..."
-        scp -r ./target/*.jar ./target/*.war '${ inputs.remote_user }'@'${ inputs.server_ip }':'${ inputs.tomcat_path }/webapps/'
-        echo "Artefacto subido."
-      shell: powershell
     - name: Desplegar en Tomcat
       run: |
         echo "Desplegando aplicación Java Spring Boot 2.5.12 en Tomcat..."
-        move '${ inputs.tomcat_path }/webapps/${ inputs.app_name }.war' '${ inputs.tomcat_path }/webapps/${ inputs.app_name }.war.bak'
+        ssh ${ inputs.remote_user }@${ inputs.server_ip } "move 'C:\artifacts\java-springboot-2.5.12\$app_name-$version.$extension' '${ inputs.tomcat_path }/webapps/'"
         echo "Despliegue en Tomcat completado."
       shell: powershell
     - name: Crear App Pool de IIS
