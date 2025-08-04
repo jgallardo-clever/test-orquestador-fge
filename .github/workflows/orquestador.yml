@@ -18,7 +18,16 @@ on:
         description: 'Entorno de despliegue'
         required: true
         type: string
-    secrets: inherit
+    secrets:
+      server_ip:
+        description: 'Dirección IP del servidor donde se desplegará la aplicación'
+        required: true
+      remote_user:
+        description: 'Usuario para conectarse al servidor remoto'
+        required: true
+      tomcat_path:
+        description: 'Ruta de instalación de Tomcat en el servidor remoto'
+        required: true
 
 jobs:
   build:
