@@ -26,14 +26,32 @@ runs:
   using: "composite"
   steps:
     - name: Crear Sitio IIS en servidor remoto
-      shell: pwsh
+      shell: powershell
       run: |
-        echo "Ruta actual: $(Get-Location)"
-        $scriptContent = Get-Content -Path ".\create-iis-site.ps1" -Raw
-        $session = New-PSSession -HostName "${{ inputs.servidor_remoto }}" -UserName "${{ inputs.usuario }}"
-        Invoke-Command -Session $session -ScriptBlock {
-          param($script, $siteName, $physicalPath, $hostHeader, $port, $appPoolName)
-          Invoke-Expression $script
-        } -ArgumentList $scriptContent, "${{ inputs.site_name }}", "${{ inputs.physical_path }}", "${{ inputs.host_header }}", "${{ inputs.port }}", "${{ inputs.app_pool_name }}"
-        Remove-PSSession $session
-        echo "Sitio IIS '${{ inputs.site_name }}' creado en el servidor remoto."
+        echo "Creando Sitio IIS '${{ inputs.site_name }}'..."
+        
+        # Cargar el contenido del script PowerShell desde archivo
+        $scriptPath = ".\create-iis-site.ps1"
+        if (Test-Path $scriptPath) {
+          $scriptContent = Get-Content -Path $scriptPath -Raw
+          
+          # Codificar en base64 para ejecución remota
+          $encodedScript = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($scriptContent))
+          
+          # Parámetros para el script
+          $arguments = "-siteName '${{ inputs.site_name }}' -appPoolName '${{ inputs.app_pool_name }}' -sitePath '${{ inputs.physical_path }}' -hostHeader '${{ inputs.host_header }}' -port ${{ inputs.port }}"
+          
+          # Ejecutar remotamente
+          ssh ${{ inputs.usuario }}@${{ inputs.servidor_remoto }} "powershell -EncodedCommand $encodedScript $arguments"
+          
+          if ($LASTEXITCODE -eq 0) {
+            echo "Sitio IIS '${{ inputs.site_name }}' creado exitosamente."
+          } else {
+            echo "Error al crear Sitio IIS."
+            exit 1
+          }
+        } else {
+          echo "Error: No se encontró el archivo $scriptPath"
+          exit 1
+        }
+      working-directory: ./orquestador/.github/actions/utils/iis-site/create-iis-site

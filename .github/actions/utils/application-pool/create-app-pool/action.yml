@@ -25,26 +25,28 @@ runs:
       run: |
         echo "Creando App Pool de IIS..."
         
-        # Construir el comando PowerShell para ejecutar remotamente
-        $command = @"
-        Import-Module WebAdministration;
-        if (Get-IISAppPool -Name '${{ inputs.app_pool_name }}' -ErrorAction SilentlyContinue) {
-          Write-Host 'App Pool ${{ inputs.app_pool_name }} ya existe'
+        # Cargar el contenido del script PowerShell desde archivo
+        $scriptPath = ".\create-app-pool.ps1"
+        if (Test-Path $scriptPath) {
+          $scriptContent = Get-Content -Path $scriptPath -Raw
+          
+          # Codificar en base64 para ejecución remota
+          $encodedScript = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($scriptContent))
+          
+          # Parámetros para el script
+          $arguments = "-appPoolName '${{ inputs.app_pool_name }}' -managedRuntimeVersion '${{ inputs.managed_runtime_version }}' -managedPipelineMode '${{ inputs.managed_pipeline_mode }}'"
+          
+          # Ejecutar remotamente
+          ssh ${{ inputs.usuario }}@${{ inputs.servidor_remoto }} "powershell -EncodedCommand $encodedScript $arguments"
+          
+          if ($LASTEXITCODE -eq 0) {
+            echo "App Pool de IIS creado exitosamente."
+          } else {
+            echo "Error al crear App Pool de IIS."
+            exit 1
+          }
         } else {
-          New-WebAppPool -Name '${{ inputs.app_pool_name }}' -Force;
-          Set-ItemProperty -Path 'IIS:\AppPools\${{ inputs.app_pool_name }}' -Name managedRuntimeVersion -Value '${{ inputs.managed_runtime_version }}';
-          Set-ItemProperty -Path 'IIS:\AppPools\${{ inputs.app_pool_name }}' -Name managedPipelineMode -Value '${{ inputs.managed_pipeline_mode }}';
-          Write-Host 'App Pool ${{ inputs.app_pool_name }} creado exitosamente'
-        }
-        "@
-        
-        # Ejecutar el comando remotamente via SSH
-        ssh ${{ inputs.usuario }}@${{ inputs.servidor_remoto }} "powershell -Command `"$command`""
-        
-        if ($LASTEXITCODE -eq 0) {
-          echo "App Pool de IIS creado exitosamente."
-        } else {
-          echo "Error al crear App Pool de IIS."
+          echo "Error: No se encontró el archivo $scriptPath"
           exit 1
         }
       shell: powershell
