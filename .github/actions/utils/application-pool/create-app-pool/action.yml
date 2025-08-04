@@ -49,7 +49,7 @@ runs:
         "@
         
         # Ejecutar remotamente con -Command
-        ssh ${{ inputs.usuario }}@${{ inputs.servidor_remoto }} "powershell -Command `"$command`""
+        ssh ${{ inputs.usuario }}@${{ inputs.servidor_remoto }} "powershell -Command $command"
         
         if ($LASTEXITCODE -eq 0) {
           echo "App Pool de IIS creado exitosamente."
