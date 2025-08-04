@@ -38,10 +38,13 @@ runs:
         if (Get-IISAppPool -Name '${{ inputs.app_pool_name }}' -ErrorAction SilentlyContinue) { 
           Write-Host 'App Pool ${{ inputs.app_pool_name }} ya existe' 
         } else { 
-          New-WebAppPool -Name '${{ inputs.app_pool_name }}' -Force; 
-          Set-ItemProperty -Path 'IIS:\AppPools\${{ inputs.app_pool_name }}' -Name managedRuntimeVersion -Value '${{ inputs.managed_runtime_version }}'; 
-          Set-ItemProperty -Path 'IIS:\AppPools\${{ inputs.app_pool_name }}' -Name managedPipelineMode -Value '${{ inputs.managed_pipeline_mode }}'; 
-          Write-Host 'App Pool ${{ inputs.app_pool_name }} creado exitosamente' 
+          echo "Creando App Pool ${{ inputs.app_pool_name }}...";
+          New-WebAppPool -Name '${{ inputs.app_pool_name }}' -Force;
+          echo "Configurando Managed Runtime Version ${{ inputs.managed_runtime_version }}...";
+          Set-ItemProperty -Path 'IIS:\AppPools\${{ inputs.app_pool_name }}' -Name managedRuntimeVersion -Value '${{ inputs.managed_runtime_version }}';
+          echo "Configurando Managed Pipeline Mode ${{ inputs.managed_pipeline_mode }}...";
+          Set-ItemProperty -Path 'IIS:\AppPools\${{ inputs.app_pool_name }}' -Name managedPipelineMode -Value '${{ inputs.managed_pipeline_mode }}';
+          Write-Host 'App Pool ${{ inputs.app_pool_name }} creado exitosamente'
         }
         "@
         
