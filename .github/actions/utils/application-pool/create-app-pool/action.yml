@@ -24,6 +24,8 @@ runs:
     - name: Crear App Pool
       run: |
         echo "Ruta actual: $(Get-Location)"
+        echo "Archivos en la ruta actual:"
+        Get-ChildItem -Path . | ForEach-Object { echo $_.Name }
         echo "Creando App Pool de IIS..."
         $scriptContent = Get-Content -Path ".\create-app-pool.ps1" -Raw
         $session = New-PSSession -HostName "${{ inputs.servidor_remoto }}" -UserName "${{ inputs.usuario }}"
