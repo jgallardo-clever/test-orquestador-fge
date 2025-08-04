@@ -36,3 +36,4 @@ runs:
         Remove-PSSession $session
         echo "App Pool de IIS creado."
       shell: powershell
+      working-directory: ./orquestador/.github/actions/utils/application-pool/create-app-pool
