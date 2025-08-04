@@ -47,10 +47,11 @@ jobs:
       - name: Build Java Spring Boot 2.5.12
         id: build_step
         if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
-        uses: jgallardo-clever/test-orquestador-fge/.github/actions/build/java-springboot-2.5.12
+        uses: ./.github/actions/build/java-springboot-2.5.12
         with:
-          server_ip: ${{ secrets.SERVER_IP }}
-          remote_user: ${{ secrets.REMOTE_USER }}
+          server_ip: ${{ secrets.server_ip }}
+          remote_user: ${{ secrets.remote_user }}
+          tomcat_path: ${{ secrets.tomcat_path }}
 
   # test:
   #   runs-on: self-hosted
@@ -65,7 +66,7 @@ jobs:
   #         echo "Tecnología: ${{ inputs.tecnologia }}"
   #     - name: Test Java Spring Boot 2.5.12
   #       if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
-  #       uses: jgallardo-clever/test-orquestador-fge/.github/actions/test/java-springboot-2.5.12
+  #       uses: ./.github/actions/test/java-springboot-2.5.12
 
   # deploy:
   #   runs-on: self-hosted
@@ -80,7 +81,7 @@ jobs:
   #         echo "Despliegue en: ${{ inputs.despliegue_en }}"
   #     - name: Deploy Java Spring Boot 2.5.12
   #       if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
-  #       uses: jgallardo-clever/test-orquestador-fge/.github/actions/deploy/java-springboot-2.5.12
+  #       uses: ./.github/actions/deploy/java-springboot-2.5.12
   #       with:
   #         server_ip: ${{ secrets.SERVER_IP }}
   #         remote_user: ${{ secrets.REMOTE_USER }}
