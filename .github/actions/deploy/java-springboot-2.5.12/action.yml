@@ -31,7 +31,7 @@ runs:
           echo "Error al desplegar en Tomcat."
           exit 1
         }
-        echo "Despliegue en Tomcat completado."
+        echo "Despliegue en Tomcat completado..."
       shell: powershell
     - name: Crear App Pool de IIS
       uses: ./.github/actions/utils/application-pool/create-app-pool
