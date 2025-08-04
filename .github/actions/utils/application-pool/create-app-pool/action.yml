@@ -23,6 +23,7 @@ runs:
   steps:
     - name: Crear App Pool
       run: |
+        echo "Ruta actual: $(Get-Location)"
         echo "Creando App Pool de IIS..."
         $scriptContent = Get-Content -Path ".\create-app-pool.ps1" -Raw
         $session = New-PSSession -HostName "${{ inputs.servidor_remoto }}" -UserName "${{ inputs.usuario }}"
@@ -33,4 +34,3 @@ runs:
         Remove-PSSession $session
         echo "App Pool de IIS creado."
       shell: powershell
-      working-directory: ./orquestador/.github/utils/application-pool/create-app-pool

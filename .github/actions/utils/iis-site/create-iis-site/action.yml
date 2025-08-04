@@ -28,6 +28,7 @@ runs:
     - name: Crear Sitio IIS en servidor remoto
       shell: pwsh
       run: |
+        echo "Ruta actual: $(Get-Location)"
         $scriptContent = Get-Content -Path ".\create-iis-site.ps1" -Raw
         $session = New-PSSession -HostName "${{ inputs.servidor_remoto }}" -UserName "${{ inputs.usuario }}"
         Invoke-Command -Session $session -ScriptBlock {
@@ -36,4 +37,3 @@ runs:
         } -ArgumentList $scriptContent, "${{ inputs.site_name }}", "${{ inputs.physical_path }}", "${{ inputs.host_header }}", "${{ inputs.port }}", "${{ inputs.app_pool_name }}"
         Remove-PSSession $session
         echo "Sitio IIS '${{ inputs.site_name }}' creado en el servidor remoto."
-      working-directory: ./orquestador/.github/actions/utils/iis-site/create-iis-site
