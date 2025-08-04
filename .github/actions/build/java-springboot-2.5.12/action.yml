@@ -45,7 +45,7 @@ runs:
       run: |
         echo "Subiendo artefactos al servidor remoto..."
         try {
-          ssh '${{ inputs.remote_user }}'@'${{ inputs.server_ip }}' mkdir -p C:\artifacts\java-springboot-2.5.12
+          ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} mkdir -p C:\artifacts\java-springboot-2.5.12
         } catch {
           echo "No se pudo crear el directorio de artefactos, posiblemente ya exista."
         }
@@ -53,7 +53,7 @@ runs:
         $artifact_name = 
         echo "Cambiando nombre del artefacto..."
         mv ./target/*.war ./target/${{ inputs.app_name }}.war
-        scp -r ./target/${{ inputs.app_name }}.war '${{ inputs.remote_user }}'@'${{ inputs.server_ip }}':'C:\artifacts\java-springboot-2.5.12'
+        scp -r ./target/${{ inputs.app_name }}.war ${{ inputs.remote_user }}@${{ inputs.server_ip }}:'C:\artifacts\java-springboot-2.5.12'
         echo "Artefactos subidos."
       shell: powershell
       working-directory: ./app
