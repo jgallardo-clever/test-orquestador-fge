@@ -32,7 +32,6 @@ on:
 jobs:
   build:
     runs-on: self-hosted
-    # if: ${{ inputs.requiere_compilar == 'true' }}
     # outputs:
     #   app_name: ${{ steps.build_step.outputs.app_name }}
     #   version: ${{ steps.build_step.outputs.version }}
