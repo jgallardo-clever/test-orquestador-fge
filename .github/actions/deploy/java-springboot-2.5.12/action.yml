@@ -25,7 +25,12 @@ runs:
     - name: Desplegar en Tomcat
       run: |
         echo "Desplegando aplicación Java Spring Boot 2.5.12 en Tomcat..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "move 'C:\artifacts\java-springboot-2.5.12\$app_name.$extension' '${{ inputs.tomcat_path }}/webapps/'"
+        try {
+          ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move "C:\artifacts\java-springboot-2.5.12\$app_name.$extension" "${{ inputs.tomcat_path }}/webapps/$app_name.$extension"
+        } catch {
+          echo "Error al desplegar en Tomcat."
+          exit 1
+        }
         echo "Despliegue en Tomcat completado."
       shell: powershell
     - name: Crear App Pool de IIS
