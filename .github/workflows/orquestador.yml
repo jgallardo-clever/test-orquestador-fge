@@ -58,7 +58,6 @@ jobs:
         with:
           server_ip: ${{ secrets.server_ip }}
           remote_user: ${{ secrets.remote_user }}
-          tomcat_path: ${{ secrets.tomcat_path }}
 
   # test:
   #   runs-on: self-hosted

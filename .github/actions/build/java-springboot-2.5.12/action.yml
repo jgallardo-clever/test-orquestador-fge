@@ -20,15 +20,13 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Change directory to app
-      run: cd app
-      shell: powershell
     - name: Compilar aplicación Java Spring Boot 2.5.12
       run: |
         echo "Compilando aplicación Java Spring Boot 2.5.12..."
         mvn clean package -DskipTests
         echo "Compilación completada."
       shell: powershell
+      working-directory: ./app
     - name: Obtener nombre, versión y extensión del artefacto desde pom.xml
       run: |
         # Cargar el contenido del archivo pom.xml
@@ -42,6 +40,7 @@ runs:
         echo "version=$version" >> $env:GITHUB_OUTPUT
         echo "extension=$extension" >> $env:GITHUB_OUTPUT
       shell: powershell
+      working-directory: ./app
     - name: Subir artefactos al servidor remoto
       run: |
         echo "Subiendo artefactos al servidor remoto..."
@@ -57,3 +56,4 @@ runs:
         scp -r ./target/${ inputs.app_name }.war '${ inputs.remote_user }'@'${ inputs.server_ip }':'C:\artifacts\java-springboot-2.5.12'
         echo "Artefactos subidos."
       shell: powershell
+      working-directory: ./app
