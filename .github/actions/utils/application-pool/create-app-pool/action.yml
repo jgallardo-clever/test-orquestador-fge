@@ -38,34 +38,15 @@ runs:
     - name: Crear App Pool
       run: |
         echo "Creando App Pool de IIS..."
-        echo "Nombre del App Pool: ${{ inputs.app_pool_name }}"
-        echo "Versión de .NET: ${{ inputs.managed_runtime_version }}"
-        echo "Modo de canalización: ${{ inputs.managed_pipeline_mode }}"
-        
-        # Cargar el contenido del script PowerShell desde archivo
-        $scriptPath = ".\create-app-pool.ps1"
-        if (Test-Path $scriptPath) {
-          $scriptContent = Get-Content -Path $scriptPath -Raw
-          
-          # Usar concatenación simple para evitar problemas con here-string
-          $wrapperScript = $scriptContent + "`n`n"
-          $wrapperScript += "# Ejecutar con parámetros`n"
-          $wrapperScript += "& { param(`$appPoolName, `$managedRuntimeVersion, `$managedPipelineMode); $scriptContent } -appPoolName '${{ inputs.app_pool_name }}' -managedRuntimeVersion '${{ inputs.managed_runtime_version }}' -managedPipelineMode '${{ inputs.managed_pipeline_mode }}'"
-          
-          # Codificar en base64
-          $encodedScript = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($wrapperScript))
-          
-          # Ejecutar remotamente
-          ssh ${{ inputs.usuario }}@${{ inputs.servidor_remoto }} "powershell -EncodedCommand $encodedScript"
-          
-          if ($LASTEXITCODE -eq 0) {
-            echo "App Pool de IIS creado exitosamente."
-          } else {
-            echo "Error al crear App Pool de IIS."
-            exit 1
-          }
-        } else {
-          echo "Error: No se encontró el archivo $scriptPath"
+        $createAppPool = New-WebAppPool -Name '${{ inputs.app_pool_name }}'
+        $setManagedRuntime = Set-ItemProperty "IIS:\AppPools\${{ inputs.app_pool_name }}" -Name "managedRuntimeVersion" -Value '${{ inputs.managed_runtime_version }}'
+        $setPipelineMode = Set-ItemProperty "IIS:\AppPools\${{ inputs.app_pool_name }}" -Name "managedPipelineMode" -Value '${{ inputs.managed_pipeline_mode }}'
+        try{
+          ssh ${{ inputs.usuario }}@${{ inputs.servidor_remoto }} "powershell -Command \"Import-Module WebAdministration; $createAppPool; $setManagedRuntime; $setPipelineMode\""
+          echo "App Pool '${{ inputs.app_pool_name }}' creado exitosamente."
+        }
+        catch {
+          echo "Error al crear App Pool en IIS."
           exit 1
         }
       shell: powershell
