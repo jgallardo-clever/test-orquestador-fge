@@ -26,7 +26,7 @@ runs:
       run: |
         echo "Desplegando aplicación Java Spring Boot 2.5.12 en Tomcat..."
         try {
-          ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\java-springboot-2.5.12\${{ inputs.app_name }}.${{ inputs.extension }}\" \"${{ inputs.tomcat_path }}\webapps\"
+          ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\java-springboot-2.5.12\${{ inputs.app_name }}.${{ inputs.extension }}\" \"${{ inputs.tomcat_path }}\"
         } catch {
           echo "Error al desplegar en Tomcat."
           exit 1
@@ -46,7 +46,7 @@ runs:
       with:
         site_name: '${{ inputs.app_name }}'
         app_pool_name: '${{ inputs.app_name }}-app-pool'
-        physical_path: '${{ inputs.tomcat_path }}/webapps/${{ inputs.app_name }}'
+        physical_path: '${{ inputs.tomcat_path }}\${{ inputs.app_name }}'
         host_header: 'http'
         port: '80'
         servidor_remoto: '${{ inputs.server_ip }}'
