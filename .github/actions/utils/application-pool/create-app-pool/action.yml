@@ -42,7 +42,7 @@ runs:
         $setManagedRuntime = Set-ItemProperty "IIS:\AppPools\${{ inputs.app_pool_name }}" -Name "managedRuntimeVersion" -Value '${{ inputs.managed_runtime_version }}'
         $setPipelineMode = Set-ItemProperty "IIS:\AppPools\${{ inputs.app_pool_name }}" -Name "managedPipelineMode" -Value '${{ inputs.managed_pipeline_mode }}'
         try{
-          ssh ${{ inputs.usuario }}@${{ inputs.servidor_remoto }} powershell -Command Import-Module WebAdministration; $createAppPool; $setManagedRuntime; $setPipelineMode
+          ssh ${{ inputs.usuario }}@${{ inputs.servidor_remoto }} powershell -Command "Start-Process powershell -ArgumentList 'Import-Module WebAdministration; $createAppPool; $setManagedRuntime; $setPipelineMode' -Verb RunAs"
           echo "App Pool '${{ inputs.app_pool_name }}' creado exitosamente."
         }
         catch {
