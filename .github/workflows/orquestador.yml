@@ -58,28 +58,39 @@ jobs:
         with:
           server_ip: ${{ secrets.server_ip }}
           remote_user: ${{ secrets.remote_user }}
+      - name: Tomar outputs de la build
+        if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
+        run: |
+          echo "Nombre de la aplicación: ${{ steps.build_step.outputs.app_name }}"
+          echo "Versión de la aplicación: ${{ steps.build_step.outputs.version }}"
+          echo "Extensión del artefacto: ${{ steps.build_step.outputs.extension }}"
 
-  # test:
-  #   runs-on: self-hosted
-  #   if: ${{ inputs.requiere_compilar == 'true' }}
-  #   needs: build
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-  #     - name: Información del entorno a testear
-  #       run: |
-  #         echo "Rama: ${{ inputs.rama }}"
-  #         echo "Tecnología: ${{ inputs.tecnologia }}"
-  #     - name: Test Java Spring Boot 2.5.12
-  #       if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
-  #       uses: ./.github/actions/test/java-springboot-2.5.12
+  test:
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Información del entorno a testear
+        run: |
+          echo "Rama: ${{ inputs.rama }}"
+          echo "Tecnología: ${{ inputs.tecnologia }}"
+      # - name: Test Java Spring Boot 2.5.12
+      #   if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
+      #   uses: ./.github/actions/test/java-springboot-2.5.12
 
   # deploy:
   #   runs-on: self-hosted
   #   needs: [build, test]
   #   steps:
-  #     - name: Checkout repository
+  #     - name: Checkout app repository
   #       uses: actions/checkout@v4
+  #       with:
+  #         path: app
+  #     - name: Checkout orquestador repository
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: jgallardo-clever/test-orquestador-fge
   #     - name: Información del entorno a desplegar
   #       run: |
   #         echo "Rama: ${{ inputs.rama }}"

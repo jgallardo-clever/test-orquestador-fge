@@ -28,6 +28,7 @@ runs:
         ssh ${ inputs.remote_user }@${ inputs.server_ip } "move 'C:\artifacts\java-springboot-2.5.12\$app_name-$version.$extension' '${ inputs.tomcat_path }/webapps/'"
         echo "Despliegue en Tomcat completado."
       shell: powershell
+      working-directory: ./app
     - name: Crear App Pool de IIS
       uses: ./.github/actions/utils/application-pool/create-app-pool
       with:
@@ -36,6 +37,7 @@ runs:
         managed_pipeline_mode: 'Integrated'
         servidor_remoto: '${ inputs.server_ip }'
         usuario: '${ inputs.remote_user }'
+      working-directory: ./app
     - name: Crear Sitio en IIS
       uses: ./.github/actions/utils/iis-site/create-iis-site
       with:
@@ -46,9 +48,11 @@ runs:
         port: '80'
         servidor_remoto: '${ inputs.server_ip }'
         usuario: '${ inputs.remote_user }'
+      working-directory: ./app
     - name: Configurar Reverse Proxy en IIS
       uses: ./.github/actions/utils/iis/configure-reverse-proxy
       with:
         site_name: '${ inputs.app_name }'
         servidor_remoto: '${ inputs.server_ip }'
         usuario: '${ inputs.remote_user }'
+      working-directory: ./app
