@@ -32,7 +32,7 @@ runs:
           exit 1
         }
         echo "Despliegue en Tomcat completado..."
-      shell: powershell
+      shell: cmd
     - name: Crear App Pool de IIS
       uses: ./.github/actions/utils/application-pool/create-app-pool
       with:
