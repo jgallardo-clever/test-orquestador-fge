@@ -87,6 +87,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: jgallardo-clever/test-orquestador-fge
+          path: orquestador
       - name: Información del entorno a desplegar
         run: |
           echo "Rama: ${{ inputs.rama }}"
@@ -94,7 +95,7 @@ jobs:
           echo "Despliegue en: ${{ inputs.despliegue_en }}"
       - name: Deploy Java Spring Boot 2.5.12
         if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
-        uses: ./.github/actions/deploy/java-springboot-2.5.12
+        uses: ./orquestador/.github/actions/deploy/java-springboot-2.5.12
         with:
           server_ip: ${{ secrets.SERVER_IP }}
           remote_user: ${{ secrets.REMOTE_USER }}

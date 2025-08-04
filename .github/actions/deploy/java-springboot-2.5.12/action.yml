@@ -36,7 +36,6 @@ runs:
         managed_pipeline_mode: 'Integrated'
         servidor_remoto: '${{ inputs.server_ip }}'
         usuario: '${{ inputs.remote_user }}'
-      working-directory: ./orquestador
     - name: Crear Sitio en IIS
       uses: ./.github/actions/utils/iis-site/create-iis-site
       with:
@@ -47,11 +46,9 @@ runs:
         port: '80'
         servidor_remoto: '${{ inputs.server_ip }}'
         usuario: '${{ inputs.remote_user }}'
-      working-directory: ./orquestador
     - name: Configurar Reverse Proxy en IIS
       uses: ./.github/actions/utils/iis/configure-reverse-proxy
       with:
         site_name: '${{ inputs.app_name }}'
         servidor_remoto: '${{ inputs.server_ip }}'
         usuario: '${{ inputs.remote_user }}'
-      working-directory: ./orquestador
