@@ -44,8 +44,9 @@ jobs:
         run: |
           echo "Rama: ${{ inputs.rama }}"
           echo "Tecnología: ${{ inputs.tecnologia }}"
-      - name: Build
-        uses: ./.github/actions/build/${{ inputs.tecnologia }}
+      - name: Build Java Spring Boot 2.5.12
+        if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
+        uses: ./.github/actions/build/java-springboot-2.5.12
         with:
           server_ip: ${{ secrets.SERVER_IP }}
           remote_user: ${{ secrets.REMOTE_USER }}
@@ -61,8 +62,9 @@ jobs:
         run: |
           echo "Rama: ${{ inputs.rama }}"
           echo "Tecnología: ${{ inputs.tecnologia }}"
-      - name: test
-        uses: ./.github/actions/test/${{ inputs.tecnologia }}
+      - name: Test Java Spring Boot 2.5.12
+        if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
+        uses: ./.github/actions/test/java-springboot-2.5.12
 
   deploy:
     runs-on: self-hosted
@@ -77,7 +79,7 @@ jobs:
           echo "Despliegue en: ${{ inputs.despliegue_en }}"
       - name: Deploy Java Spring Boot 2.5.12
         if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
-        uses: ./.github/actions/deploy/${{ inputs.tecnologia }}
+        uses: ./.github/actions/deploy/java-springboot-2.5.12
         with:
           server_ip: ${{ secrets.SERVER_IP }}
           remote_user: ${{ secrets.REMOTE_USER }}
