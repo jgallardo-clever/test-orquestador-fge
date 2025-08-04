@@ -29,7 +29,7 @@ runs:
         echo "Despliegue en Tomcat completado."
       shell: powershell
     - name: Crear App Pool de IIS
-      uses: ./.github/actions/utils/application-pool/create-app-pool
+      uses: jgallardo-clever/test-orquestador-fge/.github/actions/utils/application-pool/create-app-pool
       with:
         app_pool_name: '${ inputs.app_name }-app-pool'
         managed_runtime_version: ''
@@ -37,7 +37,7 @@ runs:
         servidor_remoto: '${ inputs.server_ip }'
         usuario: '${ inputs.remote_user }'
     - name: Crear Sitio en IIS
-      uses: ./.github/actions/utils/iis-site/create-iis-site
+      uses: jgallardo-clever/test-orquestador-fge/.github/actions/utils/iis-site/create-iis-site
       with:
         site_name: '${ inputs.app_name }'
         app_pool_name: '${ inputs.app_name }-app-pool'
