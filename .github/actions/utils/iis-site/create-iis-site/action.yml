@@ -36,3 +36,4 @@ runs:
         } -ArgumentList $scriptContent, "${{ inputs.site_name }}", "${{ inputs.physical_path }}", "${{ inputs.host_header }}", "${{ inputs.port }}", "${{ inputs.app_pool_name }}"
         Remove-PSSession $session
         echo "Sitio IIS '${{ inputs.site_name }}' creado en el servidor remoto."
+      working-directory: ./orquestador/.github/actions/utils/iis-site/create-iis-site

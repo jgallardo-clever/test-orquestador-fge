@@ -14,3 +14,4 @@ runs:
       shell: pwsh
       run: |
         ./.github/actions/utils/iis-site/setup-reverse-proxy/setup-reverse-proxy.ps1 -siteName '${{ inputs.site_name }}' -targetUrl '${{ inputs.target_url }}'
+      working-directory: ./orquestador/.github/actions/utils/iis-site/setup-reverse-proxy
