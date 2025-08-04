@@ -54,7 +54,7 @@ jobs:
       - name: Build Java Spring Boot 2.5.12
         id: build_step
         if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
-        uses: ./.github/actions/build/java-springboot-2.5.12
+        uses: ./orquestador/.github/actions/build/java-springboot-2.5.12
         with:
           server_ip: ${{ secrets.server_ip }}
           remote_user: ${{ secrets.remote_user }}
