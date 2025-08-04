@@ -50,10 +50,11 @@ runs:
           echo "No se pudo crear el directorio de artefactos, posiblemente ya exista."
         }
         echo "Obteniendo nombre del artefacto..."
-        $artifact_name = 
+        $artifact_name = $projectName-$version.$extension
         echo "Cambiando nombre del artefacto..."
-        mv ./target/*.war ./target/${{ inputs.app_name }}.war
-        scp -r ./target/${{ inputs.app_name }}.war ${{ inputs.remote_user }}@${{ inputs.server_ip }}:'C:\artifacts\java-springboot-2.5.12'
+        mv ./target/$artifact_name ./target/$projectName.$extension
+        echo "Subiendo artefacto al servidor remoto..."
+        scp -r ./target/$artifact_name ${{ inputs.remote_user }}@${{ inputs.server_ip }}:'C:\artifacts\java-springboot-2.5.12'
         echo "Artefactos subidos."
       shell: powershell
       working-directory: ./app
