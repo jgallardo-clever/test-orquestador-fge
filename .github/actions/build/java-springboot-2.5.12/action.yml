@@ -33,14 +33,17 @@ runs:
       run: |
         # Cargar el contenido del archivo pom.xml
         [xml]$pom = Get-Content pom.xml
+        
         # Obtener el nombre y la versión del proyecto
         $projectName = $pom.project.artifactId
         $version = $pom.project.version
         $extension = $pom.project.packaging
+        
         # Mostrar información
         echo "- Nombre del proyecto: $projectName"
         echo "- Versión del proyecto: $version"
         echo "- Extensión del artefacto: $extension"
+
         # Retornar el nombre y la versión
         echo "app_name=$projectName" >> $env:GITHUB_OUTPUT
         echo "version=$version" >> $env:GITHUB_OUTPUT
