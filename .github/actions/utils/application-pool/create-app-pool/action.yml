@@ -38,26 +38,19 @@ runs:
     - name: Crear App Pool
       run: |
         echo "Creando App Pool de IIS..."
+        echo "Nombre del App Pool: ${{ inputs.app_pool_name }}"
+        echo "Versión de .NET: ${{ inputs.managed_runtime_version }}"
+        echo "Modo de canalización: ${{ inputs.managed_pipeline_mode }}"
         
         # Cargar el contenido del script PowerShell desde archivo
         $scriptPath = ".\create-app-pool.ps1"
         if (Test-Path $scriptPath) {
           $scriptContent = Get-Content -Path $scriptPath -Raw
           
-          # Crear un wrapper que incluye el script y los parámetros
-          $wrapperScript = @"
-          # Script original
-          $scriptContent
-
-          # Llamar a la función principal con parámetros
-          try {
-            `$result = & { $scriptContent } -appPoolName '${{ inputs.app_pool_name }}' -managedRuntimeVersion '${{ inputs.managed_runtime_version }}' -managedPipelineMode '${{ inputs.managed_pipeline_mode }}'
-            Write-Host "Script ejecutado exitosamente"
-          } catch {
-            Write-Host "Error ejecutando script: `$_"
-            exit 1
-          }
-          "@
+          # Usar concatenación simple para evitar problemas con here-string
+          $wrapperScript = $scriptContent + "`n`n"
+          $wrapperScript += "# Ejecutar con parámetros`n"
+          $wrapperScript += "& { param(`$appPoolName, `$managedRuntimeVersion, `$managedPipelineMode); $scriptContent } -appPoolName '${{ inputs.app_pool_name }}' -managedRuntimeVersion '${{ inputs.managed_runtime_version }}' -managedPipelineMode '${{ inputs.managed_pipeline_mode }}'"
           
           # Codificar en base64
           $encodedScript = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($wrapperScript))
