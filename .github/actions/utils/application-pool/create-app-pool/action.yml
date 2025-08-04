@@ -21,6 +21,13 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Ver parámetros de entrada
+      run: |
+        echo "Creando App Pool de IIS con los siguientes parámetros:"
+        echo "Nombre del App Pool: ${{ inputs.app_pool_name }}"
+        echo "Versión de .NET: ${{ inputs.managed_runtime_version }}"
+        echo "Modo de canalización: ${{ inputs.managed_pipeline_mode }}"
+      shell: powershell
     - name: Crear App Pool
       run: |
         echo "Creando App Pool de IIS..."
