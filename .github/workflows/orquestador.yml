@@ -38,8 +38,15 @@ jobs:
       version: ${{ steps.build_step.outputs.version }}
       extension: ${{ steps.build_step.outputs.extension }}
     steps:
-      - name: Checkout repository
+      - name: Checkout app repository
         uses: actions/checkout@v4
+        with:
+          path: app
+      - name: Checkout orquestador repository
+        uses: actions/checkout@v4
+        with:
+          repository: jgallardo-clever/test-orquestador-fge
+          path: orquestador
       - name: Información del entorno a compilar
         run: |
           echo "Rama: ${{ inputs.rama }}"
