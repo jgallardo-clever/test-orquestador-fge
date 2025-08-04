@@ -29,7 +29,7 @@ runs:
         echo "Despliegue en Tomcat completado..."
       shell: cmd
     - name: Crear App Pool de IIS
-      uses: ./.github/actions/utils/application-pool/create-app-pool
+      uses: ./orquestador/.github/actions/utils/application-pool/create-app-pool
       with:
         app_pool_name: '${{ inputs.app_name }}-app-pool'
         managed_runtime_version: ''
@@ -37,7 +37,7 @@ runs:
         servidor_remoto: '${{ inputs.server_ip }}'
         usuario: '${{ inputs.remote_user }}'
     - name: Crear Sitio en IIS
-      uses: ./.github/actions/utils/iis-site/create-iis-site
+      uses: ./orquestador/.github/actions/utils/iis-site/create-iis-site
       with:
         site_name: '${{ inputs.app_name }}'
         app_pool_name: '${{ inputs.app_name }}-app-pool'
@@ -47,7 +47,7 @@ runs:
         servidor_remoto: '${{ inputs.server_ip }}'
         usuario: '${{ inputs.remote_user }}'
     - name: Configurar Reverse Proxy en IIS
-      uses: ./.github/actions/utils/iis/configure-reverse-proxy
+      uses: ./orquestador/.github/actions/utils/iis-site/setup-reverse-proxy
       with:
         site_name: '${{ inputs.app_name }}'
         servidor_remoto: '${{ inputs.server_ip }}'
