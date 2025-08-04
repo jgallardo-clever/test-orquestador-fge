@@ -34,9 +34,9 @@ jobs:
     runs-on: self-hosted
     if: ${{ inputs.requiere_compilar == 'true' }}
     outputs:
-      app_name: ${{ steps.build.outputs.app_name }}
-      version: ${{ steps.build.outputs.version }}
-      extension: ${{ steps.build.outputs.extension }}
+      app_name: ${{ steps.build_step.outputs.app_name }}
+      version: ${{ steps.build_step.outputs.version }}
+      extension: ${{ steps.build_step.outputs.extension }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -45,6 +45,7 @@ jobs:
           echo "Rama: ${{ inputs.rama }}"
           echo "Tecnología: ${{ inputs.tecnologia }}"
       - name: Build Java Spring Boot 2.5.12
+        id: build_step
         if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
         uses: ./.github/actions/build/java-springboot-2.5.12
         with:
