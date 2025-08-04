@@ -33,10 +33,10 @@ jobs:
   build:
     runs-on: self-hosted
     if: ${{ inputs.requiere_compilar == 'true' }}
-    outputs:
-      app_name: ${{ steps.build_step.outputs.app_name }}
-      version: ${{ steps.build_step.outputs.version }}
-      extension: ${{ steps.build_step.outputs.extension }}
+    # outputs:
+    #   app_name: ${{ steps.build_step.outputs.app_name }}
+    #   version: ${{ steps.build_step.outputs.version }}
+    #   extension: ${{ steps.build_step.outputs.extension }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,47 +44,47 @@ jobs:
         run: |
           echo "Rama: ${{ inputs.rama }}"
           echo "Tecnología: ${{ inputs.tecnologia }}"
-      - name: Build Java Spring Boot 2.5.12
-        id: build_step
-        if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
-        uses: ./.github/actions/build/java-springboot-2.5.12
-        with:
-          server_ip: ${{ secrets.SERVER_IP }}
-          remote_user: ${{ secrets.REMOTE_USER }}
+      # - name: Build Java Spring Boot 2.5.12
+      #   id: build_step
+      #   if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
+      #   uses: ./.github/actions/build/java-springboot-2.5.12
+      #   with:
+      #     server_ip: ${{ secrets.SERVER_IP }}
+      #     remote_user: ${{ secrets.REMOTE_USER }}
 
-  test:
-    runs-on: self-hosted
-    if: ${{ inputs.requiere_compilar == 'true' }}
-    needs: build
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Información del entorno a testear
-        run: |
-          echo "Rama: ${{ inputs.rama }}"
-          echo "Tecnología: ${{ inputs.tecnologia }}"
-      - name: Test Java Spring Boot 2.5.12
-        if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
-        uses: ./.github/actions/test/java-springboot-2.5.12
+  # test:
+  #   runs-on: self-hosted
+  #   if: ${{ inputs.requiere_compilar == 'true' }}
+  #   needs: build
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+  #     - name: Información del entorno a testear
+  #       run: |
+  #         echo "Rama: ${{ inputs.rama }}"
+  #         echo "Tecnología: ${{ inputs.tecnologia }}"
+  #     - name: Test Java Spring Boot 2.5.12
+  #       if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
+  #       uses: ./.github/actions/test/java-springboot-2.5.12
 
-  deploy:
-    runs-on: self-hosted
-    needs: [build, test]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Información del entorno a desplegar
-        run: |
-          echo "Rama: ${{ inputs.rama }}"
-          echo "Tecnología: ${{ inputs.tecnologia }}"
-          echo "Despliegue en: ${{ inputs.despliegue_en }}"
-      - name: Deploy Java Spring Boot 2.5.12
-        if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
-        uses: ./.github/actions/deploy/java-springboot-2.5.12
-        with:
-          server_ip: ${{ secrets.SERVER_IP }}
-          remote_user: ${{ secrets.REMOTE_USER }}
-          tomcat_path: ${{ secrets.TOMCAT_PATH }}
-          app_name: ${{ needs.build.outputs.app_name }}
-          version: ${{ needs.build.outputs.version }}
-          extension: ${{ needs.build.outputs.extension }}
+  # deploy:
+  #   runs-on: self-hosted
+  #   needs: [build, test]
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+  #     - name: Información del entorno a desplegar
+  #       run: |
+  #         echo "Rama: ${{ inputs.rama }}"
+  #         echo "Tecnología: ${{ inputs.tecnologia }}"
+  #         echo "Despliegue en: ${{ inputs.despliegue_en }}"
+  #     - name: Deploy Java Spring Boot 2.5.12
+  #       if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
+  #       uses: ./.github/actions/deploy/java-springboot-2.5.12
+  #       with:
+  #         server_ip: ${{ secrets.SERVER_IP }}
+  #         remote_user: ${{ secrets.REMOTE_USER }}
+  #         tomcat_path: ${{ secrets.TOMCAT_PATH }}
+  #         app_name: ${{ needs.build.outputs.app_name }}
+  #         version: ${{ needs.build.outputs.version }}
+  #         extension: ${{ needs.build.outputs.extension }}
