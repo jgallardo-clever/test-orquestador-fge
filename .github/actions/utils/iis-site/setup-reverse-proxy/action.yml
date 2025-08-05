@@ -10,9 +10,15 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Configurar Reverse Proxy
-      shell: pwsh
+    - name: Ver parámetros de entrada
       run: |
-        echo "Ruta actual: $(Get-Location)"
-        echo "Configurando Reverse Proxy en IIS para el sitio '${{ inputs.site_name }}'..."
-        ./.github/actions/utils/iis-site/setup-reverse-proxy/setup-reverse-proxy.ps1 -siteName '${{ inputs.site_name }}' -targetUrl '${{ inputs.target_url }}'
+        echo "Configurando Reverse Proxy en IIS con los siguientes parámetros:"
+        echo "Nombre del sitio: ${{ inputs.site_name }}"
+        echo "URL del servidor backend: ${{ inputs.target_url }}"
+      shell: powershell
+    - name: Configurar Reverse Proxy
+      run: |
+        echo "Ejecutando el script para configurar el Reverse Proxy en IIS..."
+        .\setup-reverse-proxy.ps1 -siteName '${{ inputs.site_name }}' -targetUrl '${{ inputs.target_url }}' -ipServer '${{ inputs.servidor_remoto }}' -sshUser '${{ inputs.usuario }}'
+      shell: powershell
+      working-directory: ./orquestador/.github/actions/utils/iis-site/setup-reverse-proxy

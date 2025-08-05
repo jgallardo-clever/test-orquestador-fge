@@ -30,24 +30,7 @@ runs:
       shell: powershell
     - name: Crear App Pool
       run: |
-        echo "Creando App Pool de IIS con los siguientes parámetros:"
-        echo "Nombre del App Pool: ${{ inputs.app_pool_name }}"
-        echo "Versión de .NET: ${{ inputs.managed_runtime_version }}"
-        echo "Modo de canalización: ${{ inputs.managed_pipeline_mode }}"
-      shell: powershell
-    - name: Crear App Pool
-      run: |
-        echo "Creando App Pool de IIS..."
-        $createAppPool = New-WebAppPool -Name '${{ inputs.app_pool_name }}'
-        $setManagedRuntime = Set-ItemProperty "IIS:\AppPools\${{ inputs.app_pool_name }}" -Name "managedRuntimeVersion" -Value '${{ inputs.managed_runtime_version }}'
-        $setPipelineMode = Set-ItemProperty "IIS:\AppPools\${{ inputs.app_pool_name }}" -Name "managedPipelineMode" -Value '${{ inputs.managed_pipeline_mode }}'
-        try{
-          ssh ${{ inputs.usuario }}@${{ inputs.servidor_remoto }} powershell -Command "Start-Process powershell -ArgumentList 'Import-Module WebAdministration; $createAppPool; $setManagedRuntime; $setPipelineMode' -Verb RunAs"
-          echo "App Pool '${{ inputs.app_pool_name }}' creado exitosamente."
-        }
-        catch {
-          echo "Error al crear App Pool en IIS."
-          exit 1
-        }
+        echo "Ejecutando el script para crear el Application Pool en IIS..."
+        .\create-iis-site.ps1 -appPoolName '${{ inputs.app_pool_name }}' -managedRuntimeVersion '${{ inputs.managed_runtime_version }}' -managedPipelineMode '${{ inputs.managed_pipeline_mode }}' -ipServer '${{ inputs.servidor_remoto }}' -sshUser '${{ inputs.usuario }}'
       shell: powershell
       working-directory: ./orquestador/.github/actions/utils/application-pool/create-app-pool

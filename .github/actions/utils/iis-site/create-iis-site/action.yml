@@ -25,33 +25,18 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Crear Sitio IIS en servidor remoto
-      shell: powershell
+    - name: Ver parámetros de entrada
       run: |
-        echo "Creando Sitio IIS '${{ inputs.site_name }}'..."
-        
-        # Cargar el contenido del script PowerShell desde archivo
-        $scriptPath = ".\create-iis-site.ps1"
-        if (Test-Path $scriptPath) {
-          $scriptContent = Get-Content -Path $scriptPath -Raw
-          
-          # Codificar en base64 para ejecución remota
-          $encodedScript = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($scriptContent))
-          
-          # Parámetros para el script
-          $arguments = "-siteName '${{ inputs.site_name }}' -appPoolName '${{ inputs.app_pool_name }}' -sitePath '${{ inputs.physical_path }}' -hostHeader '${{ inputs.host_header }}' -port ${{ inputs.port }}"
-          
-          # Ejecutar remotamente
-          ssh ${{ inputs.usuario }}@${{ inputs.servidor_remoto }} "powershell -EncodedCommand $encodedScript $arguments"
-          
-          if ($LASTEXITCODE -eq 0) {
-            echo "Sitio IIS '${{ inputs.site_name }}' creado exitosamente."
-          } else {
-            echo "Error al crear Sitio IIS."
-            exit 1
-          }
-        } else {
-          echo "Error: No se encontró el archivo $scriptPath"
-          exit 1
-        }
+        echo "Creando Sitio IIS con los siguientes parámetros:"
+        echo "Nombre del sitio: ${{ inputs.site_name }}"
+        echo "Application Pool: ${{ inputs.app_pool_name }}"
+        echo "Ruta física: ${{ inputs.physical_path }}"
+        echo "Encabezado del sitio: ${{ inputs.host_header }}"
+        echo "Puerto: ${{ inputs.port }}"
+      shell: powershell
+    - name: Crear Sitio IIS
+      run: |
+        echo "Ejecutando el script para crear el sitio IIS..."
+        .\create-iis-site.ps1 -siteName '${{ inputs.site_name }}' -appPoolName '${{ inputs.app_pool_name }}' -sitePath '${{ inputs.physical_path }}' -hostHeader '${{ inputs.host_header }}' -port '${{ inputs.port }}' -ipAddress '${{ inputs.servidor_remoto }}' -sshUser '${{ inputs.usuario }}'
+      shell: powershell
       working-directory: ./orquestador/.github/actions/utils/iis-site/create-iis-site
