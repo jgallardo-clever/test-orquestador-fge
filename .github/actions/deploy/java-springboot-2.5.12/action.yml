@@ -42,7 +42,7 @@ runs:
         site_name: '${{ inputs.app_name }}'
         app_pool_name: '${{ inputs.app_name }}-app-pool'
         physical_path: '${{ inputs.tomcat_path }}\${{ inputs.app_name }}'
-        host_header: 'http'
+        host_header: 'localhost'
         port: '80'
         servidor_remoto: '${{ inputs.server_ip }}'
         usuario: '${{ inputs.remote_user }}'
@@ -50,5 +50,6 @@ runs:
       uses: ./orquestador/.github/actions/utils/iis-site/setup-reverse-proxy
       with:
         site_name: '${{ inputs.app_name }}'
+        target_url: 'http://localhost:9000/${{ inputs.app_name }}'
         servidor_remoto: '${{ inputs.server_ip }}'
         usuario: '${{ inputs.remote_user }}'

@@ -7,6 +7,12 @@ inputs:
   target_url:
     description: "URL del servidor backend (ejemplo: http://localhost:5000)"
     required: true
+  servidor_remoto:
+    description: "Nombre o dirección IP del servidor remoto donde se configurará el Reverse Proxy"
+    required: true
+  usuario:
+    description: "Usuario para conectarse al servidor remoto"
+    required: true
 runs:
   using: "composite"
   steps:

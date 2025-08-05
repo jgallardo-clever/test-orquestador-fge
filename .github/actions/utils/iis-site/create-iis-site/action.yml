@@ -11,7 +11,7 @@ inputs:
     description: "Ruta física del sitio (ejemplo: C:\\inetpub\\wwwroot\\mysite)"
     required: true
   host_header:
-    description: "Encabezado del sitio (ejemplo: http, https)"
+    description: "Encabezado o dominio del sitio (ejemplo: www.misitio.com)"
     required: true
   port:
     description: "Puerto en el que se escuchará el sitio (ejemplo: 80)"
