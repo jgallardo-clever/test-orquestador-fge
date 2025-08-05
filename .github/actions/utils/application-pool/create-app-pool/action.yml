@@ -31,6 +31,6 @@ runs:
     - name: Crear App Pool
       run: |
         echo "Ejecutando el script para crear el Application Pool en IIS..."
-        .\create-iis-site.ps1 -appPoolName '${{ inputs.app_pool_name }}' -managedRuntimeVersion '${{ inputs.managed_runtime_version }}' -managedPipelineMode '${{ inputs.managed_pipeline_mode }}' -ipServer '${{ inputs.servidor_remoto }}' -sshUser '${{ inputs.usuario }}'
+        .\create-app-pool.ps1 -appPoolName '${{ inputs.app_pool_name }}' -managedRuntimeVersion '${{ inputs.managed_runtime_version }}' -managedPipelineMode '${{ inputs.managed_pipeline_mode }}' -ipServer '${{ inputs.servidor_remoto }}' -sshUser '${{ inputs.usuario }}'
       shell: powershell
       working-directory: ./orquestador/.github/actions/utils/application-pool/create-app-pool
