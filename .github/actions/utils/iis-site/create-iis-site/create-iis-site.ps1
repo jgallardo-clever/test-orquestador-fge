@@ -29,6 +29,13 @@ if (-not $ipServer -or -not $sshUser -or -not $siteName -or -not $appPoolName -o
 }
 
 $remoteScript = @"
+# Dar acceso a IIS_IUSRS al directorio del sitio
+try {
+    icacls '$sitePath' /grant 'IIS_IUSRS:(OI)(CI)M'
+} catch {
+    Write-Error "Failed to set permissions on $sitePath. Ensure the path exists and is accessible."
+    return
+}
 # Importamos el módulo WebAdministration para gestionar IIS
 try {
     Import-Module WebAdministration
