@@ -1,39 +1,44 @@
 ##########################################################################
-#
 # Creación de un sitio IIS básico de IIS usando PowerShell
-#
-# Este script crea un sitio IIS con un Application Pool específico y
-# configura sus parámetros básicos.
-#
-# Los parámetros avanzados del sitio deben ser configurados con otro
-# script.
-#
+# (Los parámetros avanzados del sitio deben ser configurados con otro
+# script).
 ##########################################################################
 
 param (
+    # Parámetros del Application Pool
     [string]$siteName,                  # Nombre del sitio IIS a crear    
-    [string]$appPoolName,                # Nombre del Application Pool para el sitio
-    [string]$sitePath,# Ruta física al directorio del sitio
+    [string]$appPoolName,               # Nombre del Application Pool para el sitio
+    [string]$sitePath,                  # Ruta física al directorio del sitio
     [string]$ipAddress = "*",           # Dirección IP en la que escuchará el sitio
     [int]$port = 80,                    # Puerto que escuchará el sitio
-    [string]$hostHeader = "localhost",   # Dominio o encabezado del sitio
+    [string]$hostHeader = "localhost",  # Dominio o encabezado del sitio
 
-    [string]$ipServer,
-    [string]$sshUser  # Usuario SSH para conectarse al servidor remoto
+    # Parámetros de conexión al servidor IIS
+    [string]$ipServer,                  # Dirección IP del servidor IIS
+    [string]$sshUser                    # Usuario SSH para conectarse al servidor remoto
 )
+
+##########################################################################
+# Validación de parámetros
+##########################################################################
 
 # Si no se especifica ipServer ni sshUser, se cancela la ejecución
 if (-not $ipServer -or -not $sshUser -or -not $siteName -or -not $appPoolName -or -not $sitePath) {
-    Write-Error "ipServer, sshUser, siteName, appPoolName, and sitePath must be specified."
+    Write-Error "ipServer, sshUser, siteName, appPoolName, y sitePath deben ser especificados."
     return
 }
 
+##########################################################################
+# Script remoto para crear el Application Pool
+##########################################################################
+
+# Cargamos el script remoto que se ejecutará en el servidor IIS
 $remoteScript = @"
 # Dar acceso a IIS_IUSRS al directorio del sitio
 try {
     icacls '$sitePath' /grant 'IIS_IUSRS:(OI)(CI)M'
 } catch {
-    Write-Error "Failed to set permissions on $sitePath. Ensure the path exists and is accessible."
+    Write-Error "Error al establecer permisos en $sitePath. Asegúrese de que la ruta exista y sea accesible."
     return
 }
 # Importamos el módulo WebAdministration para gestionar IIS
@@ -41,52 +46,61 @@ try {
     Import-Module WebAdministration
 }
 catch {
-    Write-Error "Failed to import WebAdministration module. Ensure IIS is installed and the module is available."
+    Write-Error "Error al importar el módulo WebAdministration. Asegúrese de que IIS esté instalado y el módulo esté disponible."
     return
 }
 
-Write-Host "Setting up IIS Site: $siteName"
+Write-Host "Configurando el sitio IIS: $siteName"
 
 # Verificamos si el Application Pool ya existe
-Write-Host "Checking if Application Pool $appPoolName exists..."
+Write-Host "Verificando si el Application Pool $appPoolName existe..."
 try{
     # Si el Application Pool ya existe, no devolverá error, por lo que podemos continuar con la ejecución
     Get-WebAppPoolState -Name $appPoolName -ErrorAction SilentlyContinue | Out-Null
-    Write-Host "Application Pool $appPoolName already exists."
+    Write-Host "El Application Pool $appPoolName ya existe."
 } catch {
     # Si no existe, informamos al usuario y finalizamos el script
-    Write-Host "Application Pool $appPoolName does not exist."
+    Write-Host "El Application Pool $appPoolName no existe."
     return
 }
 
 # Verificamos si el sitio IIS ya existe
-Write-Host "Checking if IIS Site $siteName exists..."
+Write-Host "Verificando si el sitio IIS $siteName existe..."
 try {
     `$exists = Get-Website -Name $siteName -ErrorAction SilentlyContinue
     Write-Host "Resultado validacion: `$exists"
-    # Si sitio web existe, lo eliminamos
+    # Si sitio web ya existe, lo eliminamos (para crear uno nuevo posteriormente)
     if(`$exists -ne `$null) {
-        Write-Host "Site $siteName already exists. Removing it..."
+        Write-Host "El sitio $siteName ya existe. Eliminándolo..."
         Remove-Website -Name $siteName -ErrorAction SilentlyContinue
-        Write-Host "Removed existing site: $siteName"
+        Write-Host "Se eliminó el sitio existente: $siteName"
     }
     # Creamos el sitio IIS
     try {
         New-Website -Name '$siteName' -ApplicationPool '$appPoolName' -PhysicalPath '$sitePath' -IPAddress '$ipAddress' -Port '$port' -HostHeader '$hostHeader'
-        Write-Host "Created Site: $siteName with Application Pool: $appPoolName"
+        Write-Host "Se creó el sitio: $siteName con el Application Pool: $appPoolName"
     }
     catch {
-        Write-Host "Failed to create site $siteName. Please check the parameters and try again."
+        Write-Host "Error al crear el sitio $siteName. Verifique los parámetros e intente nuevamente."
         Write-Host "`$_"
         return
     }
 } catch {
-    Write-Host "An error occurred: `$_"
+    Write-Host "Ocurrió un error: `$_"
+    return
 }
 "@
 
-# Codificamos el script en Base64 para evitar problemas con caracteres especiales
+##########################################################################
+# Cofificación del script
+##########################################################################
+
+# Codificar en Base64 para evitar problemas con caracteres especiales
 $encodedScript = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($remoteScript))
 
-# Ejecutar el comando remotamente suprimiendo streams de información
+##########################################################################
+# Ejecutar el script remoto
+##########################################################################
+
+# Ejecutar remotamente, suprimiendo streams de información para no saturar la salida
 ssh $sshUser@$ipServer "powershell -EncodedCommand $encodedScript" 2>$null 6>$null
