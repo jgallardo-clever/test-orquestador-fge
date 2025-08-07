@@ -75,9 +75,9 @@ runs:
         $dotnetVersionRaw = $project.Project.PropertyGroup.TargetFrameworkVersion
         
         # Convertir a string y limpiar espacios
-        $projectName = $projectNameRaw.ToString().Trim()
-        $dotnetVersion = $dotnetVersionRaw.ToString().Trim()
-        
+        $projectName = "$projectNameRaw".Trim()
+        $dotnetVersion = "$dotnetVersionRaw".Trim()
+
         # Mostrar información preliminar
         echo "- Nombre del proyecto (raw): '$projectNameRaw'"
         echo "- Versión de .NET (raw): '$dotnetVersionRaw'"
