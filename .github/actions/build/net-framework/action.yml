@@ -70,24 +70,24 @@ runs:
           exit 1
         }
 
-        # Obtener el nombre y la versión del proyecto
-        $projectName = $project.Project.PropertyGroup.AssemblyName
-        $dotnetVersion = $project.Project.PropertyGroup.TargetFrameworkVersion
+        # Obtener el nombre y la versión del proyecto (convertir a string explícitamente)
+        $projectNameRaw = $project.Project.PropertyGroup.AssemblyName
+        $dotnetVersionRaw = $project.Project.PropertyGroup.TargetFrameworkVersion
+        
+        # Convertir a string y limpiar espacios
+        $projectName = $projectNameRaw.ToString().Trim()
+        $dotnetVersion = $dotnetVersionRaw.ToString().Trim()
         
         # Mostrar información preliminar
-        echo "- Nombre del proyecto: $projectName"
-        echo "- Versión de .NET: $dotnetVersion"
-
-        # Quitar espacios en blanco
-        $projectName = $projectName.ToString().Trim()
-
-        # Mostrar información final
-        echo "Nombre del proyecto: $projectName"
+        echo "- Nombre del proyecto (raw): '$projectNameRaw'"
+        echo "- Versión de .NET (raw): '$dotnetVersionRaw'"
+        echo "- Nombre del proyecto (limpio): '$projectName'"
+        echo "- Versión de .NET (limpio): '$dotnetVersion'"
 
         # Retornar el nombre y la versión
         echo "app_name=$projectName" >> $env:GITHUB_OUTPUT
-        echo "Nombre de la aplicación: =$projectName="
         echo "dotnet_version=$dotnetVersion" >> $env:GITHUB_OUTPUT
+
         # Llegamos hasta acá para testear
         exit 1
       shell: powershell
