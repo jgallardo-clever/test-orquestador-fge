@@ -73,13 +73,16 @@ runs:
         # Obtener el nombre y la versión del proyecto
         $projectName = $project.Project.PropertyGroup.AssemblyName
         $dotnetVersion = $project.Project.PropertyGroup.TargetFrameworkVersion
+        
+        # Mostrar información preliminar
+        echo "- Nombre del proyecto: $projectName"
+        echo "- Versión de .NET: $dotnetVersion"
 
         # Quitar espacios en blanco
         $projectName = $projectName.Trim()
-        
-        # Mostrar información
-        echo "- Nombre del proyecto: $projectName"
-        echo "- Versión de .NET: $dotnetVersion"
+
+        # Mostrar información final
+        echo "Nombre del proyecto: $projectName"
 
         # Retornar el nombre y la versión
         echo "app_name=$projectName" >> $env:GITHUB_OUTPUT
