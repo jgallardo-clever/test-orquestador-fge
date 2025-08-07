@@ -79,7 +79,7 @@ runs:
         echo "- Versión de .NET: $dotnetVersion"
 
         # Quitar espacios en blanco
-        $projectName = $projectName.Trim()
+        $projectName = $projectName.ToString().Trim()
 
         # Mostrar información final
         echo "Nombre del proyecto: $projectName"
