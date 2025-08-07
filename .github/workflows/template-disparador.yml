@@ -15,9 +15,7 @@ on:
         type: choice
         options:
           - 'java-springboot-2.5.12'
-          - 'net-framework-4.6'
-          - 'net-framework-4.7'
-          - 'net-framework-4.8'
+          - 'net-framework-4'
           - 'php-laravel'
           - 'nodejs-nestjs'
           - 'nodejs-reactjs'

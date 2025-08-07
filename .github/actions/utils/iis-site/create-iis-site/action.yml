@@ -16,6 +16,10 @@ inputs:
   port:
     description: "Puerto en el que se escuchará el sitio (ejemplo: 80)"
     required: true
+  ip_address:
+    description: "Dirección IP del sitio (dejar vacío para todas las IPs)"
+    required: false
+    default: '*'
   servidor_remoto:
     description: "Nombre o dirección IP del servidor remoto donde se creará el sitio"
     required: true
@@ -37,6 +41,6 @@ runs:
     - name: Crear Sitio IIS
       run: |
         echo "Ejecutando el script para crear el sitio IIS..."
-        .\create-iis-site.ps1 -siteName '${{ inputs.site_name }}' -appPoolName '${{ inputs.app_pool_name }}' -sitePath '${{ inputs.physical_path }}' -hostHeader '${{ inputs.host_header }}' -port '${{ inputs.port }}' -ipAddress '${{ inputs.servidor_remoto }}' -ipServer '${{ inputs.servidor_remoto }}' -sshUser '${{ inputs.usuario }}'
+        .\create-iis-site.ps1 -siteName '${{ inputs.site_name }}' -appPoolName '${{ inputs.app_pool_name }}' -sitePath '${{ inputs.physical_path }}' -hostHeader '${{ inputs.host_header }}' -port '${{ inputs.port }}' -ipAddress '${{ inputs.ip_address }}' -ipServer '${{ inputs.servidor_remoto }}' -sshUser '${{ inputs.usuario }}'
       shell: powershell
       working-directory: ./orquestador/.github/actions/utils/iis-site/create-iis-site

@@ -1,0 +1,119 @@
+name: Action para compilar aplicaciones .NET Framework
+description: 'Esta acción compila aplicaciones .NET Framework'
+inputs:
+  server_ip: 
+    description: 'Dirección IP del servidor donde se desplegará la aplicación'
+    required: true
+  remote_user:
+    description: 'Usuario para conectarse al servidor remoto'
+    required: true
+outputs:
+  app_name:
+    description: 'Nombre de la aplicación compilada'
+    value: ${{ steps.get_artifact.outputs.app_name }}
+  version:
+    description: 'Versión de la aplicación compilada'
+    value: ${{ steps.get_artifact.outputs.version }}
+  extension:
+    description: 'Extensión del artefacto compilado'
+    value: ${{ steps.get_artifact.outputs.extension }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Buscar archivos de proyecto .NET y retornar ruta del directorio
+      id: find_project_directory
+      run: |
+        echo "Buscando archivos de proyecto .NET..."
+        $projectFiles = Get-ChildItem -Path ./app -Recurse -Include *.csproj, *.vbproj
+        if ($projectFiles.Count -eq 0) {
+          echo "No se encontraron archivos de proyecto .NET."
+          exit 1
+        }
+        $projectFile = $projectFiles[0].FullName
+        $projectDirectory = Split-Path $projectFile -Parent
+        echo "Ruta del directorio del proyecto: $projectDirectory"
+        echo "project_file=$projectFile" >> $env:GITHUB_OUTPUT
+        echo "project_directory=$projectDirectory" >> $env:GITHUB_OUTPUT
+      shell: powershell
+      working-directory: ./app
+
+    - name: Compilar aplicación .NET Framework
+      run: |
+        echo "Recuperando dependencias..."
+        try {
+          dotnet restore
+        } catch {
+          echo "Error al recuperar dependencias."
+          return
+        }
+        echo "Compilando aplicación .NET Framework..."
+        try {
+          msbuild /p:Configuration=Release /p:Platform="Any CPU" /p:OutputPath=./bin/Release
+        } catch {
+          echo "Error al compilar la aplicación."
+          return
+        }
+        echo "Compilación completada."
+      shell: powershell
+      working-directory: ./app/${{ steps.find_project_directory.outputs.project_directory }}
+
+    - name: Obtener nombre del proyecto .NET
+      id: get_artifact
+      run: |
+        # Cargar el contenido del archivo de proyecto
+        try {
+          [xml]$project = Get-Content ${{ steps.find_project_directory.outputs.project_file }}
+        } catch {
+          echo "Error al cargar el archivo de proyecto."
+          return
+        }
+
+        # Obtener el nombre y la versión del proyecto
+        $projectName = $project.Project.PropertyGroup.AssemblyName
+        $dotnetVersion = $project.Project.PropertyGroup.TargetFrameworkVersion
+        
+        # Mostrar información
+        echo "- Nombre del proyecto: $projectName"
+        echo "- Versión de .NET: $dotnetVersion"
+
+        # Retornar el nombre y la versión
+        echo "app_name=$projectName" >> $env:GITHUB_OUTPUT
+        echo "dotnet_version=$dotnetVersion" >> $env:GITHUB_OUTPUT
+      shell: powershell
+      working-directory: ./app/${{ steps.find_project_directory.outputs.project_directory }}
+      
+    - name: Subir artefactos al servidor remoto
+      run: |
+        echo "Subiendo artefactos al servidor remoto..."
+        
+        # Crear directorio remoto (comando correcto para Windows)
+        try {
+          ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "if not exist C:\artifacts mkdir C:\artifacts"
+        } catch {
+          echo "Error al crear el directorio de artefactos en el servidor remoto."
+          return
+        }
+
+        # Obtener información del artefacto desde outputs del step anterior
+        $appName = "${{ steps.get_artifact.outputs.app_name }}"
+        $dotnetVersion = "${{ steps.get_artifact.outputs.dotnet_version }}"
+        
+        # Comprimir el directorio del proyecto
+
+        try {
+          $zipFile = "C:\artifacts\net-framework\$appName.zip"
+          Compress-Archive -Path "./app/${{ steps.find_project_directory.outputs.project_directory }}\*" -DestinationPath $zipFile
+        } catch {
+          echo "Error al comprimir el directorio del proyecto."
+          return
+        }
+
+        # Subir el archivo comprimido al servidor remoto
+        try {
+          scp $zipFile ${{ inputs.remote_user }}@${{ inputs.server_ip }}:C:\artifacts\net-framework
+        } catch {
+          echo "Error al subir el archivo comprimido al servidor remoto."
+          return
+        }
+      shell: powershell
+      working-directory: ./app/${{ steps.find_project_directory.outputs.project_directory }}

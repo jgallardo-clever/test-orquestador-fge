@@ -34,9 +34,9 @@ jobs:
     runs-on: self-hosted
     if: inputs.requiere_compilar
     outputs:
-      app_name: ${{ steps.build_step.outputs.app_name }}
-      version: ${{ steps.build_step.outputs.version }}
-      extension: ${{ steps.build_step.outputs.extension }}
+      app_name: ${{ steps.build_step_java.outputs.app_name || steps.build_step_net_framework.outputs.app_name }}
+      version: ${{ steps.build_step_java.outputs.version || steps.build_step_net_framework.outputs.version }}
+      extension: ${{ steps.build_step_java.outputs.extension || steps.build_step_net_framework.outputs.extension }}
     steps:
       - name: Checkout app repository
         uses: actions/checkout@v4
@@ -52,18 +52,36 @@ jobs:
           echo "Rama: ${{ inputs.rama }}"
           echo "Tecnología: ${{ inputs.tecnologia }}"
       - name: Build Java Spring Boot 2.5.12
-        id: build_step
+        id: build_step_java
         if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
         uses: ./orquestador/.github/actions/build/java-springboot-2.5.12
         with:
           server_ip: ${{ secrets.server_ip }}
           remote_user: ${{ secrets.remote_user }}
-      - name: Tomar outputs de la build
+
+      - name: Tomar outputs de la build Java Spring Boot 2.5.12
         if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
         run: |
-          echo "Nombre de la aplicación: ${{ steps.build_step.outputs.app_name }}"
-          echo "Versión de la aplicación: ${{ steps.build_step.outputs.version }}"
-          echo "Extensión del artefacto: ${{ steps.build_step.outputs.extension }}"
+          echo "Nombre de la aplicación: ${{ steps.build_step_java.outputs.app_name }}"
+          echo "Versión de la aplicación: ${{ steps.build_step_java.outputs.version }}"
+          echo "Extensión del artefacto: ${{ steps.build_step_java.outputs.extension }}"
+
+      - name: Build .NET Framework
+        id: build_step_net_framework
+        if: ${{ inputs.tecnologia == 'net-framework' }}
+        uses: ./orquestador/.github/actions/build/net-framework
+        with:
+          server_ip: ${{ secrets.server_ip }}
+          remote_user: ${{ secrets.remote_user }}
+          dotnet_version: '4.8'
+          app_name: 'net-framework-4'
+
+      - name: Tomar outputs de la build .NET Framework
+        if: ${{ inputs.tecnologia == 'net-framework' }}
+        run: |
+          echo "Nombre de la aplicación: ${{ steps.build_step_net_framework.outputs.app_name }}"
+          echo "Versión de la aplicación: ${{ steps.build_step_net_framework.outputs.version }}"
+          echo "Extensión del artefacto: ${{ steps.build_step_net_framework.outputs.extension }}"
 
   test:
     runs-on: self-hosted
@@ -103,3 +121,14 @@ jobs:
           app_name: ${{ needs.build.outputs.app_name }}
           version: ${{ needs.build.outputs.version }}
           extension: ${{ needs.build.outputs.extension }}
+          ip_address: 'localhost'
+
+      - name: Deploy .NET Framework
+        if: ${{ inputs.tecnologia == 'net-framework' }}
+        uses: ./orquestador/.github/actions/deploy/net-framework
+        with:
+          server_ip: ${{ secrets.SERVER_IP }}
+          remote_user: ${{ secrets.REMOTE_USER }}
+          project_path: 'C:\inetpub\wwwroot\${{ needs.build.outputs.app_name }}'
+          app_name: ${{ needs.build.outputs.app_name }}
+          ip_address: 'localhost'
