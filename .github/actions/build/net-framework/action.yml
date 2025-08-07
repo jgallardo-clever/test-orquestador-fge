@@ -45,8 +45,10 @@ runs:
     - name: Compilar aplicación .NET Framework
       run: |
         echo "Recuperando dependencias desde ${{ steps.find_project_directory.outputs.project_directory }}..."
+        ls .
         try {
-          dotnet restore
+          echo "Ruta actual: $(pwd)"
+          nuget restore
         } catch {
           echo "Error al recuperar dependencias."
           exit 1
