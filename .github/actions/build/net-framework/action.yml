@@ -88,8 +88,6 @@ runs:
         echo "app_name=$projectName" >> $env:GITHUB_OUTPUT
         echo "dotnet_version=$dotnetVersion" >> $env:GITHUB_OUTPUT
 
-        # Llegamos hasta acá para testear
-        exit 1
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
       
