@@ -22,7 +22,7 @@ runs:
     - name: Desplegar en aplicación .NET Framework
       run: |
         echo "Desplegando aplicación .NET Framework en el servidor remoto..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\net-framework-4\${{ inputs.app_name }}.zip\" \"${{ inputs.project_path }}\"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\net-framework\${{ inputs.app_name }}.zip\" \"${{ inputs.project_path }}\"
         echo "Descompresion de artefacto en el servidor remoto..."
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} powershell -Command "Expand-Archive -Path \"${{ inputs.project_path }}\${{ inputs.app_name }}.\" -DestinationPath \"${{ inputs.project_path }}\" -Force"
         echo "Despliegue en aplicación .NET Framework completado..."
