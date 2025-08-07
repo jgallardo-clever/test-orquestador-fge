@@ -41,7 +41,7 @@ runs:
       run: |
         echo "Recuperando dependencias..."
         try {
-          dotnet restore
+          nuget restore
         } catch {
           echo "Error al recuperar dependencias."
           return
