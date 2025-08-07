@@ -33,6 +33,7 @@ runs:
         $projectDirectory = Split-Path $projectFile -Parent
         echo "Ruta del directorio del proyecto: $projectDirectory"
         echo "project_directory=$projectDirectory" >> $env:GITHUB_OUTPUT
+        echo "project_file=$projectFile" >> $env:GITHUB_OUTPUT
 
       shell: powershell
       working-directory: ./app
