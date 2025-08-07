@@ -39,7 +39,7 @@ runs:
 
     - name: Compilar aplicación .NET Framework
       run: |
-        echo "Recuperando dependencias..."
+        echo "Recuperando dependencias desde ${{ steps.find_project_directory.outputs.project_directory }}..."
         try {
           nuget restore
         } catch {
@@ -61,6 +61,7 @@ runs:
       id: get_artifact
       run: |
         # Cargar el contenido del archivo de proyecto
+        echo "Obteniendo nombre y versión del proyecto .NET desde ${{ steps.find_project_directory.outputs.project_file }}..."
         try {
           [xml]$project = Get-Content ${{ steps.find_project_directory.outputs.project_file }}
         } catch {
@@ -80,7 +81,7 @@ runs:
         echo "app_name=$projectName" >> $env:GITHUB_OUTPUT
         echo "dotnet_version=$dotnetVersion" >> $env:GITHUB_OUTPUT
       shell: powershell
-      working-directory: ./app/${{ steps.find_project_directory.outputs.project_directory }}
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
       
     - name: Subir artefactos al servidor remoto
       run: |
@@ -102,7 +103,7 @@ runs:
 
         try {
           $zipFile = "C:\artifacts\net-framework\$appName.zip"
-          Compress-Archive -Path "./app/${{ steps.find_project_directory.outputs.project_directory }}\*" -DestinationPath $zipFile
+          Compress-Archive -Path "${{ steps.find_project_directory.outputs.project_directory }}\*" -DestinationPath $zipFile
         } catch {
           echo "Error al comprimir el directorio del proyecto."
           return
@@ -116,4 +117,4 @@ runs:
           return
         }
       shell: powershell
-      working-directory: ./app/${{ steps.find_project_directory.outputs.project_directory }}
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
