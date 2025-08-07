@@ -24,7 +24,7 @@ runs:
       id: find_project_directory
       run: |
         echo "Buscando archivos de proyecto .NET..."
-        $projectFiles = Get-ChildItem -Path ./app -Recurse -Include *.csproj, *.vbproj
+        $projectFiles = Get-ChildItem -Path -Recurse -Include *.csproj, *.vbproj
         if ($projectFiles.Count -eq 0) {
           echo "No se encontraron archivos de proyecto .NET."
           exit 1
