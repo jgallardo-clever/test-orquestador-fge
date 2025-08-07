@@ -55,7 +55,7 @@ runs:
         }
         echo "Compilación completada."
       shell: powershell
-      working-directory: ./app/${{ steps.find_project_directory.outputs.project_directory }}
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
     - name: Obtener nombre del proyecto .NET
       id: get_artifact
