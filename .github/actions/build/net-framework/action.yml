@@ -90,7 +90,7 @@ runs:
         
         # Crear directorio remoto (comando correcto para Windows)
         try {
-          ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "if not exist C:\artifacts mkdir C:\artifacts"
+          ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "if not exist C:\artifacts\net-framework mkdir C:\artifacts\net-framework"
         } catch {
           echo "Error al crear el directorio de artefactos en el servidor remoto."
           exit 1
@@ -112,7 +112,7 @@ runs:
 
         # Subir el archivo comprimido al servidor remoto
         try {
-          scp $zipFile ${{ inputs.remote_user }}@${{ inputs.server_ip }}:C:\artifacts\net-framework
+          scp $zipFile ${{ inputs.remote_user }}@${{ inputs.server_ip }}:C:\artifacts\net-framework\
         } catch {
           echo "Error al subir el archivo comprimido al servidor remoto."
           exit 1
