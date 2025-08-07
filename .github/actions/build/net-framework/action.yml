@@ -34,68 +34,25 @@ runs:
         echo "Ruta del directorio del proyecto: $projectDirectory"
         echo "project_file=$projectFile" >> $env:GITHUB_OUTPUT
         echo "project_directory=$projectDirectory" >> $env:GITHUB_OUTPUT
-        echo "Ruta: "
-        pwd
-        echo "Listando archivos en el directorio del proyecto..."
-        Get-ChildItem -Path $projectDirectory
 
       shell: powershell
       working-directory: ./app
 
-    - name: Verificar herramientas de compilación
-      run: |
-        echo "Verificando disponibilidad de herramientas de compilación..."
-        try {
-            nuget help | Out-Null
-            echo "✓ NuGet está disponible"
-        } catch {
-            echo "✗ NuGet no está disponible"
-        }
-        
-        try {
-            msbuild /version | Out-Null
-            echo "✓ MSBuild está disponible"
-        } catch {
-            echo "✗ MSBuild no está disponible"
-        }
-      shell: powershell
-
     - name: Compilar aplicación .NET Framework
       run: |
         echo "Recuperando dependencias desde ${{ steps.find_project_directory.outputs.project_directory }}..."
-        Get-ChildItem -Path .
-        
-        # Verificar si existe packages.config
-        if (Test-Path "packages.config") {
-            echo "Archivo packages.config encontrado. Restaurando paquetes NuGet..."
-            try {
-                # Restaurar paquetes usando el archivo de solución si existe
-                if (Test-Path "*.sln") {
-                    $solutionFile = Get-ChildItem -Filter "*.sln" | Select-Object -First 1
-                    echo "Restaurando usando archivo de solución: $($solutionFile.Name)"
-                    nuget restore $solutionFile.Name
-                } else {
-                    # Restaurar usando packages.config
-                    echo "Restaurando usando packages.config..."
-                    nuget restore packages.config -PackagesDirectory packages
-                }
-            } catch {
-                echo "Error al recuperar dependencias con NuGet: $_"
-                echo "Intentando continuar sin restauración..."
-            }
-        } else {
-            echo "No se encontró packages.config. Continuando sin restauración de paquetes..."
+        try {
+          nuget restore
+        } catch {
+          echo "Error al recuperar dependencias."
+          exit 1
         }
-        
         echo "Compilando aplicación .NET Framework..."
         try {
-            # Compilar usando el archivo de proyecto
-            $projectFile = Get-ChildItem -Filter "*.csproj" | Select-Object -First 1
-            echo "Compilando proyecto: $($projectFile.Name)"
-            msbuild $projectFile.Name /p:Configuration=Release /p:Platform="Any CPU" /p:OutputPath=bin\Release /p:RestorePackages=true
+          msbuild /p:Configuration=Release /p:Platform="Any CPU" /p:OutputPath=./bin/Release
         } catch {
-            echo "Error al compilar la aplicación: $_"
-            exit 1
+          echo "Error al compilar la aplicación."
+          exit 1
         }
         echo "Compilación completada."
       shell: powershell
@@ -146,7 +103,7 @@ runs:
         # Comprimir el directorio del proyecto
 
         try {
-          $zipFile = "C:\artifacts\net-framework\$appName.zip"
+          $zipFile = "$appName.zip"
           Compress-Archive -Path "${{ steps.find_project_directory.outputs.project_directory }}\*" -DestinationPath $zipFile
         } catch {
           echo "Error al comprimir el directorio del proyecto."
