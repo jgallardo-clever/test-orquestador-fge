@@ -32,12 +32,7 @@ runs:
         $projectFile = $projectFiles[0].FullName
         $projectDirectory = Split-Path $projectFile -Parent
         echo "Ruta del directorio del proyecto: $projectDirectory"
-        echo "project_file=$projectFile" >> $env:GITHUB_OUTPUT
         echo "project_directory=$projectDirectory" >> $env:GITHUB_OUTPUT
-        echo "Nombre del proyecto: $projectFile"
-        
-        # Llegamos hasta acá para testear
-        exit 1
 
       shell: powershell
       working-directory: ./app
@@ -84,7 +79,10 @@ runs:
 
         # Retornar el nombre y la versión
         echo "app_name=$projectName" >> $env:GITHUB_OUTPUT
+        echo "Nombre de la aplicación: =$projectName="
         echo "dotnet_version=$dotnetVersion" >> $env:GITHUB_OUTPUT
+        # Llegamos hasta acá para testear
+        exit 1
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
       
