@@ -34,6 +34,10 @@ runs:
         echo "Ruta del directorio del proyecto: $projectDirectory"
         echo "project_file=$projectFile" >> $env:GITHUB_OUTPUT
         echo "project_directory=$projectDirectory" >> $env:GITHUB_OUTPUT
+        echo "Nombre del proyecto: $projectFile"
+        
+        # Llegamos hasta acá para testear
+        exit 1
 
       shell: powershell
       working-directory: ./app

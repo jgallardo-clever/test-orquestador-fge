@@ -24,7 +24,7 @@ runs:
         echo "Desplegando aplicación .NET Framework en el servidor remoto..."
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\net-framework\${{ inputs.app_name }}.zip\" \"${{ inputs.project_path }}\"
         echo "Descompresion de artefacto en el servidor remoto..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} powershell -Command "Expand-Archive -Path \"${{ inputs.project_path }}\${{ inputs.app_name }}.\" -DestinationPath \"${{ inputs.project_path }}\" -Force"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} powershell -Command "Expand-Archive -Path \"${{ inputs.project_path }}\${{ inputs.app_name }}.zip\" -DestinationPath \"${{ inputs.project_path }}\" -Force"
         echo "Despliegue en aplicación .NET Framework completado..."
       shell: cmd
     - name: Crear App Pool de IIS
