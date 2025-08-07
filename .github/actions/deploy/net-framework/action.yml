@@ -22,9 +22,11 @@ runs:
     - name: Desplegar en aplicación .NET Framework
       run: |
         echo "Desplegando aplicación .NET Framework en el servidor remoto..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\net-framework\${{ inputs.app_name }}.zip\" \"${{ inputs.project_path }}\"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\net-framework\${{ inputs.app_name }}.zip\" \"${{ inputs.project_path }}\${{ inputs.app_name }}.zip\"
         echo "Descompresion de artefacto en el servidor remoto..."
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} powershell -Command "Expand-Archive -Path \"${{ inputs.project_path }}\${{ inputs.app_name }}.zip\" -DestinationPath \"${{ inputs.project_path }}\" -Force"
+        echo "Eliminar archivo ZIP del servidor remoto..."
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} del \"${{ inputs.project_path }}\${{ inputs.app_name }}.zip\"
         echo "Despliegue en aplicación .NET Framework completado..."
       shell: cmd
     - name: Crear App Pool de IIS
@@ -40,9 +42,9 @@ runs:
       with:
         site_name: '${{ inputs.app_name }}'
         app_pool_name: '${{ inputs.app_name }}-app-pool'
-        physical_path: '${{ inputs.project_path }}'
+        physical_path: '${{ inputs.project_path }}\${{ inputs.app_name }}'
         host_header: 'localhost'
         port: '80'
-        ip_address: '${{ inputs.ip_address }}'
+        # ip_address: '${{ inputs.ip_address }}'
         servidor_remoto: '${{ inputs.server_ip }}'
         usuario: '${{ inputs.remote_user }}'
