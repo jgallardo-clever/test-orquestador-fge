@@ -34,6 +34,11 @@ runs:
         echo "Ruta del directorio del proyecto: $projectDirectory"
         echo "project_file=$projectFile" >> $env:GITHUB_OUTPUT
         echo "project_directory=$projectDirectory" >> $env:GITHUB_OUTPUT
+        echo "Ruta: "
+        pwd
+        echo "Listando archivos en el directorio del proyecto..."
+        ls
+
       shell: powershell
       working-directory: ./app
 
@@ -44,14 +49,14 @@ runs:
           nuget restore
         } catch {
           echo "Error al recuperar dependencias."
-          return
+          return 1
         }
         echo "Compilando aplicación .NET Framework..."
         try {
           msbuild /p:Configuration=Release /p:Platform="Any CPU" /p:OutputPath=./bin/Release
         } catch {
           echo "Error al compilar la aplicación."
-          return
+          return 1
         }
         echo "Compilación completada."
       shell: powershell
@@ -66,7 +71,7 @@ runs:
           [xml]$project = Get-Content ${{ steps.find_project_directory.outputs.project_file }}
         } catch {
           echo "Error al cargar el archivo de proyecto."
-          return
+          return 1
         }
 
         # Obtener el nombre y la versión del proyecto
@@ -92,7 +97,7 @@ runs:
           ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "if not exist C:\artifacts mkdir C:\artifacts"
         } catch {
           echo "Error al crear el directorio de artefactos en el servidor remoto."
-          return
+          return 1
         }
 
         # Obtener información del artefacto desde outputs del step anterior
@@ -106,7 +111,7 @@ runs:
           Compress-Archive -Path "${{ steps.find_project_directory.outputs.project_directory }}\*" -DestinationPath $zipFile
         } catch {
           echo "Error al comprimir el directorio del proyecto."
-          return
+          return 1
         }
 
         # Subir el archivo comprimido al servidor remoto
@@ -114,7 +119,7 @@ runs:
           scp $zipFile ${{ inputs.remote_user }}@${{ inputs.server_ip }}:C:\artifacts\net-framework
         } catch {
           echo "Error al subir el archivo comprimido al servidor remoto."
-          return
+          return 1
         }
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
