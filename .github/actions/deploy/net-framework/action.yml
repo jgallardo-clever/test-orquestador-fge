@@ -28,8 +28,6 @@ runs:
         echo "Descompresion de artefacto en el servidor remoto..."
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} powershell -Command "Expand-Archive -Path \"${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.app_name }}.zip\" -DestinationPath \"${{ inputs.project_path }}\${{ inputs.app_name }}\" -Force"
         echo "Eliminar archivo ZIP del servidor remoto..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} del \"${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.app_name }}.zip\"
-        echo "Despliegue en aplicación .NET Framework completado..."
       shell: cmd
     - name: Crear App Pool de IIS
       uses: ./orquestador/.github/actions/utils/application-pool/create-app-pool
