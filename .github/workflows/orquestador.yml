@@ -27,7 +27,10 @@ on:
         required: true
       tomcat_path:
         description: 'Ruta de instalación de Tomcat en el servidor remoto'
-        required: true
+        required: false
+      project_path:
+        description: 'Ruta del proyecto en el servidor remoto'
+        required: false
 
 jobs:
   build:
@@ -129,6 +132,6 @@ jobs:
         with:
           server_ip: ${{ secrets.SERVER_IP }}
           remote_user: ${{ secrets.REMOTE_USER }}
-          project_path: 'C:\inetpub\wwwroot\${{ needs.build.outputs.app_name }}'
+          project_path: '${{ secrets.PROJECT_PATH }}'
           app_name: ${{ needs.build.outputs.app_name }}
           ip_address: 'localhost'
