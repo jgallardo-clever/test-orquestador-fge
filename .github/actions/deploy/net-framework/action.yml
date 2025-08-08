@@ -34,7 +34,7 @@ runs:
       uses: ./orquestador/.github/actions/utils/application-pool/create-app-pool
       with:
         app_pool_name: '${{ inputs.app_name }}-app-pool'
-        managed_runtime_version: ''
+        managed_runtime_version: 'v4.0'
         managed_pipeline_mode: 'Integrated'
         servidor_remoto: '${{ inputs.server_ip }}'
         usuario: '${{ inputs.remote_user }}'

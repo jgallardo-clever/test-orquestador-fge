@@ -49,7 +49,7 @@ runs:
         }
         echo "Compilando aplicación .NET Framework..."
         try {
-          msbuild /p:Configuration=Release /p:Platform="Any CPU" /p:OutputPath=./bin/Release
+          msbuild
         } catch {
           echo "Error al compilar la aplicación."
           exit 1
