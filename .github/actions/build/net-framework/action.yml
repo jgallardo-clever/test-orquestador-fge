@@ -23,15 +23,20 @@ runs:
     - name: Buscar archivos de proyecto .NET y retornar ruta del directorio
       id: find_project_directory
       run: |
-        echo "Buscando archivos de proyecto .NET..."
+        # Buscar archivos de proyecto .NET
         $projectFiles = Get-ChildItem -Path . -Recurse -Include *.csproj, *.vbproj
         if ($projectFiles.Count -eq 0) {
           echo "No se encontraron archivos de proyecto .NET."
           exit 1
         }
+        
+        # Tomar el primer archivo de proyecto encontrado
         $projectFile = $projectFiles[0].FullName
+
+        # Obtener el directorio del archivo de proyecto
         $projectDirectory = Split-Path $projectFile -Parent
-        echo "Ruta del directorio del proyecto: $projectDirectory"
+
+        # Exportar la ruta completa del directorio del proyecto y el archivo de proyecto
         echo "project_directory=$projectDirectory" >> $env:GITHUB_OUTPUT
         echo "project_file=$projectFile" >> $env:GITHUB_OUTPUT
 
@@ -40,14 +45,14 @@ runs:
 
     - name: Compilar aplicación .NET Framework
       run: |
-        echo "Recuperando dependencias desde ${{ steps.find_project_directory.outputs.project_directory }}..."
+        # Restaurar dependencias con nuget
         try {
           nuget restore
         } catch {
           echo "Error al recuperar dependencias."
           exit 1
         }
-        echo "Compilando aplicación .NET Framework..."
+        # Compilar la aplicación con msbuild
         try {
           msbuild
         } catch {
@@ -62,7 +67,6 @@ runs:
       id: get_artifact
       run: |
         # Cargar el contenido del archivo de proyecto
-        echo "Obteniendo nombre y versión del proyecto .NET desde ${{ steps.find_project_directory.outputs.project_file }}..."
         try {
           [xml]$project = Get-Content ${{ steps.find_project_directory.outputs.project_file }}
         } catch {
@@ -93,8 +97,6 @@ runs:
       
     - name: Subir artefactos al servidor remoto
       run: |
-        echo "Subiendo artefactos al servidor remoto..."
-        
         # Crear directorio remoto (comando correcto para Windows)
         try {
           ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "if not exist C:\artifacts\net-framework mkdir C:\artifacts\net-framework"
@@ -108,7 +110,6 @@ runs:
         $dotnetVersion = "${{ steps.get_artifact.outputs.dotnet_version }}"
         
         # Comprimir el directorio del proyecto
-
         try {
           $zipFile = "$appName.zip"
           Compress-Archive -Path "${{ steps.find_project_directory.outputs.project_directory }}\*" -DestinationPath $zipFile
