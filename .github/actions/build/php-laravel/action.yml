@@ -1,0 +1,52 @@
+name: Action para compilar aplicaciones PHP Laravel
+description: 'Esta acción compila aplicaciones PHP Laravel'
+inputs:
+  server_ip: 
+    description: 'Dirección IP del servidor donde se desplegará la aplicación'
+    required: true
+  remote_user:
+    description: 'Usuario para conectarse al servidor remoto'
+    required: true
+outputs:
+  app_name:
+    description: 'Nombre de la aplicación'
+    value: ${{ steps.build.outputs.app_name }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Buscamos el directorio de la aplicación
+      id: find_project_directory
+      run: |
+        echo "Buscando el directorio de la aplicación en el repositorio..."
+        
+        # Buscamos el archivo composer.json para determinar el directorio del proyecto usando powershell
+        $projectDir = Get-ChildItem -Recurse -Filter composer.json | Select-Object -First 1 | ForEach-Object { $_.DirectoryName }
+        if (-not $projectDir) {
+          Write-Error "No se encontró el archivo composer.json"
+          exit 1
+        }
+        
+        # Exportamos la variable de entorno con el directorio de la aplicación
+        echo "project_directory=$projectDir" >> $env:GITHUB_OUTPUT
+        
+        echo "Directorio de la aplicación: $projectDir"
+      shell: powershell
+      working-directory: ./app
+
+    - name: Instalar dependencias de la aplicación en el repositorio
+      run: |
+        echo "Instalando dependencias de composer..."
+        composer install --no-dev --optimize-autoloader
+        echo "Instalando dependencias de npm..."
+        npm install --production
+      shell: powershell
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
+
+    - name: Obtener el nombre del proyecto desde package-lock.json
+      id: get_project_name
+      run: |
+        # Recuperamos el nombre del proyecto considerando el nombre del directorio
+        $rutaActual = Split-Path -Path (Get-Location) -Leaf
+        echo "app_name=$rutaActual" >> $env:GITHUB_OUTPUT
+      shell: powershell
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
