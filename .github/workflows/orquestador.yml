@@ -81,8 +81,6 @@ jobs:
         if: ${{ inputs.tecnologia == 'net-framework' }}
         run: |
           echo "Nombre de la aplicación: ${{ steps.build_step_net_framework.outputs.app_name }}"
-          echo "Versión de la aplicación: ${{ steps.build_step_net_framework.outputs.version }}"
-          echo "Extensión del artefacto: ${{ steps.build_step_net_framework.outputs.extension }}"
 
   test:
     runs-on: self-hosted

@@ -21,16 +21,16 @@ runs:
   steps:
     - name: Desplegar en aplicación .NET Framework
       run: |
-        # Crear directorio para la aplicación en el servidor remoto
+        echo "Crear directorio para la aplicación en el servidor remoto"
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} mkdir \"${{ inputs.project_path }}\${{ inputs.app_name }}\"
 
-        # Desplegando aplicación .NET Framework en el servidor remoto
+        echo "Desplegando aplicación .NET Framework en el servidor remoto"
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\net-framework\${{ inputs.app_name }}.zip\" \"${{ inputs.project_path }}\${{ inputs.app_name }}\"
 
-        # Descompresion de artefacto en el servidor remoto
+        echo "Descompresion de artefacto en el servidor remoto"
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} powershell -Command "Expand-Archive -Path \"${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.app_name }}.zip\" -DestinationPath \"${{ inputs.project_path }}\${{ inputs.app_name }}\" -Force"
-        
-        # Eliminar archivo ZIP del servidor remoto
+
+        echo "Eliminar archivo ZIP del servidor remoto"
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} del \"${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.app_name }}.zip\"
       shell: cmd
 
