@@ -7,6 +7,12 @@ inputs:
   remote_user:
     description: 'Usuario para conectarse al servidor remoto'
     required: true
+  app_key:
+    description: 'Clave de la aplicación'
+    required: true
+  app_url:
+    description: 'URL de la aplicación'
+    required: true
 outputs:
   app_name:
     description: 'Nombre de la aplicación'
@@ -33,12 +39,24 @@ runs:
       shell: powershell
       working-directory: ./app
 
+    - name: Crear .env
+      run: |
+        # Crear .env
+        echo "Creando archivo .env..."
+        cp .env.example .env
+        echo "Archivo .env creado."
+        # Agregar variables de entorno necesarias
+        (Get-Content .env) -replace '^API_KEY=.*', "API_KEY=${{ inputs.app_key }}" | Set-Content .env
+        (Get-Content .env) -replace '^APP_URL=.*', "APP_URL=${{ inputs.app_url }}" | Set-Content .env
+      shell: powershell
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
+
     - name: Instalar dependencias de la aplicación en el repositorio
       run: |
         echo "Instalando dependencias de composer..."
-        composer install --no-dev --optimize-autoloader
+        composer install
         echo "Instalando dependencias de npm..."
-        npm install --omit=dev
+        npm install
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
