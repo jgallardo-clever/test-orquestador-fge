@@ -38,7 +38,7 @@ runs:
         echo "Instalando dependencias de composer..."
         composer install --no-dev --optimize-autoloader
         echo "Instalando dependencias de npm..."
-        npm install --production
+        npm install --omit=dev
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
@@ -57,7 +57,7 @@ runs:
         Compress-Archive -Path * -DestinationPath ../${{ steps.get_project_name.outputs.app_name }}.zip
         # Crear directorio de artefactos en el servidor remoto si no existe
         try {
-          ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "mkdir -p C:\artifacts\php-laravel"
+          ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "mkdir C:\artifacts\php-laravel"
         } catch {
           Write-Error "No se pudo crear el directorio de artefactos en el servidor remoto"
           exit 1
