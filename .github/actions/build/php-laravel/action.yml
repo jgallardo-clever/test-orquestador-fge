@@ -10,7 +10,7 @@ inputs:
 outputs:
   app_name:
     description: 'Nombre de la aplicación'
-    value: ${{ steps.build.outputs.app_name }}
+    value: ${{ steps.get_project_name.outputs.app_name }}
 runs:
   using: 'composite'
   steps:
@@ -48,5 +48,21 @@ runs:
         # Recuperamos el nombre del proyecto considerando el nombre del directorio
         $rutaActual = Split-Path -Path (Get-Location) -Leaf
         echo "app_name=$rutaActual" >> $env:GITHUB_OUTPUT
+      shell: powershell
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
+
+    - name: Subir artefacto al servidor remoto
+      run: |
+        # Comprimir el directorio de la aplicación
+        Compress-Archive -Path * -DestinationPath ../${{ steps.get_project_name.outputs.app_name }}.zip
+        # Crear directorio de artefactos en el servidor remoto si no existe
+        try {
+          ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "mkdir -p C:\artifacts\php-laravel"
+        } catch {
+          Write-Error "No se pudo crear el directorio de artefactos en el servidor remoto"
+          exit 1
+        }
+        # Subir el artefacto al servidor remoto
+        scp ../${{ steps.get_project_name.outputs.app_name }}.zip ${{ inputs.remote_user }}@${{ inputs.server_ip }}:C:\artifacts\php-laravel
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}

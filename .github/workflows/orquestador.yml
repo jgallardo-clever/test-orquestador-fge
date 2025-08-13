@@ -82,6 +82,19 @@ jobs:
         run: |
           echo "Nombre de la aplicación: ${{ steps.build_step_net_framework.outputs.app_name }}"
 
+      - name: Build PHP Laravel
+        id: build_step_php_laravel
+        if: ${{ inputs.tecnologia == 'php-laravel' }}
+        uses: ./orquestador/.github/actions/build/php-laravel
+        with:
+          server_ip: ${{ secrets.server_ip }}
+          remote_user: ${{ secrets.remote_user }}
+
+      - name: Tomar outputs de la build PHP Laravel
+        if: ${{ inputs.tecnologia == 'php-laravel' }}
+        run: |
+          echo "Nombre de la aplicación: ${{ steps.build_step_php_laravel.outputs.app_name }}"
+
   test:
     runs-on: self-hosted
     needs: build
