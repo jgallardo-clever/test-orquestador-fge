@@ -51,6 +51,14 @@ runs:
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
+    - name: Configurar base de datos
+      run: |
+        # Configurar base de datos sqlite si no está configurada
+        # Acá vamos a tener una lógica diferente dependiendo de la implementación
+        php artisan migrate
+      shell: powershell
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
+
     - name: Instalar dependencias de la aplicación en el repositorio
       run: |
         echo "Instalando dependencias de composer..."
