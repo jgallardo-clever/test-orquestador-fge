@@ -73,7 +73,7 @@ runs:
         cp .env.example .env
         echo "Archivo .env creado."
         # Agregar variables de entorno necesarias
-        (Get-Content .env) -replace '^API_KEY=.*', "API_KEY=${{ inputs.app_key }}" | Set-Content .env
+        (Get-Content .env) -replace '^APP_KEY=.*', "APP_KEY=${{ inputs.app_key }}" | Set-Content .env
         (Get-Content .env) -replace '^APP_URL=.*', "APP_URL=${{ inputs.app_url }}" | Set-Content .env
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}

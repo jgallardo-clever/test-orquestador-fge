@@ -89,7 +89,7 @@ jobs:
         with:
           server_ip: ${{ secrets.server_ip }}
           remote_user: ${{ secrets.remote_user }}
-          app_key: ${{ secrets.api_key }}
+          app_key: ${{ secrets.app_key }}
           app_url: ${{ secrets.app_url }}
 
       - name: Tomar outputs de la build PHP Laravel
