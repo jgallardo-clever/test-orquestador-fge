@@ -55,7 +55,8 @@ runs:
       run: |
         # Configurar base de datos sqlite si no está configurada
         # Acá vamos a tener una lógica diferente dependiendo de la implementación
-        php artisan migrate
+        pwd
+        php artisan migrate --force
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
