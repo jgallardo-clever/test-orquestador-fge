@@ -27,12 +27,12 @@ if (-not $ipServer -or -not $sshUser -or -not $siteName -or -not $defaultDocumen
 
 # Cargamos el script remoto que se ejecutará en el servidor IIS
 $remoteScript = @"
-# Importamos el módulo WebAdministration para gestionar IIS
+# Importamos el modulo WebAdministration para gestionar IIS
 try {
     Import-Module WebAdministration
 }
 catch {
-    Write-Error "Error al importar el módulo WebAdministration. Asegúrese de que IIS esté instalado y el módulo esté disponible."
+    Write-Error "Error al importar el modulo WebAdministration. Asegúrese de que IIS este instalado y el modulo este disponible."
     return
 }
 
