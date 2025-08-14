@@ -29,3 +29,4 @@ runs:
         echo "Ejecutando el script para configurar el documento por defecto en IIS..."
         .\add-default-document.ps1 -ipServer '${{ inputs.ipServer }}' -sshUser '${{ inputs.sshUser }}' -siteName '${{ inputs.siteName }}' -defaultDocument '${{ inputs.defaultDocument }}'
       shell: powershell
+      working-directory: ./orquestador/.github/actions/utils/iis-site/add-default-document
