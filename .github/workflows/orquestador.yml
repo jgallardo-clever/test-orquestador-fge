@@ -146,3 +146,12 @@ jobs:
           project_path: '${{ secrets.PROJECT_PATH }}'
           app_name: ${{ needs.build.outputs.app_name }}
           ip_address: 'localhost'
+
+      - name: Deploy PHP Laravel
+        if: ${{ inputs.tecnologia == 'php-laravel' }}
+        uses: ./orquestador/.github/actions/deploy/php-laravel
+        with:
+          server_ip: ${{ secrets.SERVER_IP }}
+          remote_user: ${{ secrets.REMOTE_USER }}
+          project_path: '${{ secrets.PROJECT_PATH }}'
+          app_name: ${{ needs.build.outputs.app_name }}

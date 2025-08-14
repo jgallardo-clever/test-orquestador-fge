@@ -1,0 +1,61 @@
+name: Action para desplegar aplicaciones PHP Laravel
+description: Esta acción se encarga de desplegar aplicaciones PHP Laravel en un entorno de producción.
+inputs:
+  server_ip:
+    description: 'Dirección IP del servidor donde se desplegará la aplicación'
+    required: true
+  remote_user:
+    description: 'Nombre de usuario para acceder al servidor remoto'
+    required: true
+  project_path:
+    description: 'Ruta del proyecto en el servidor remoto'
+    required: true
+  app_name:
+    description: 'Nombre de la aplicación a desplegar'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Desplegar aplicación PHP Laravel
+      run: |
+        echo "Crear directorio para la aplicación en el servidor remoto"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} mkdir \"${{ inputs.project_path }}/${{ inputs.app_name }}\"
+
+        echo "Desplegando aplicación PHP Laravel en el servidor remoto"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\php-laravel\${{ inputs.app_name }}.zip\" \"${{ inputs.project_path }}/${{ inputs.app_name }}\"
+
+        echo "Descompresion de artefacto en el servidor remoto"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} powershell -Command "Expand-Archive -Path \"${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.app_name }}.zip\" -DestinationPath \"${{ inputs.project_path }}\${{ inputs.app_name }}\" -Force"
+
+        echo "Eliminar archivo ZIP del servidor remoto"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} del \"${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.app_name }}.zip\"
+      shell: cmd
+
+    - name: Crear App Pool de IIS
+      uses: ./orquestador/.github/actions/utils/application-pool/create-app-pool
+      with:
+        app_pool_name: '${{ inputs.app_name }}-app-pool'
+        managed_runtime_version: 'v4.0'
+        managed_pipeline_mode: 'Integrated'
+        servidor_remoto: '${{ inputs.server_ip }}'
+        usuario: '${{ inputs.remote_user }}'
+
+    - name: Crear Sitio en IIS
+      uses: ./orquestador/.github/actions/utils/iis-site/create-iis-site
+      with:
+        site_name: '${{ inputs.app_name }}'
+        app_pool_name: '${{ inputs.app_name }}-app-pool'
+        physical_path: '${{ inputs.project_path }}\${{ inputs.app_name }}'
+        host_header: 'localhost'
+        port: '80'
+        # ip_address: '${{ inputs.ip_address }}'
+        servidor_remoto: '${{ inputs.server_ip }}'
+        usuario: '${{ inputs.remote_user }}'
+
+    - name: Configurar archivo por defecto del sitio
+      uses: ./orquestador/.github/actions/utils/iis-site/add-default-document
+      with:
+        ipServer: '${{ inputs.server_ip }}'
+        sshUser: '${{ inputs.remote_user }}'
+        siteName: '${{ inputs.app_name }}'
+        defaultDocument: 'index.php'
