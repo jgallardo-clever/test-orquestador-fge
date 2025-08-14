@@ -45,7 +45,7 @@ runs:
       with:
         site_name: '${{ inputs.app_name }}'
         app_pool_name: '${{ inputs.app_name }}-app-pool'
-        physical_path: '${{ inputs.project_path }}\${{ inputs.app_name }}'
+        physical_path: '${{ inputs.project_path }}\${{ inputs.app_name }}\public'
         host_header: 'localhost'
         port: '80'
         # ip_address: '${{ inputs.ip_address }}'
