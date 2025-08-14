@@ -36,11 +36,11 @@ catch {
     return
 }
 
-Write-Host "Configurando el documento por defecto para el sitio: '$siteName'"
+Write-Host "Configurando el documento por defecto para el sitio: $siteName"
 
 # Configuramos el documento por defecto
 try {
-    Add-WebConfigurationProperty -Filter "system.webServer/defaultDocument/files" -PSPath "IIS:\Sites\$siteName" -AtIndex 0 -Name "Collection" -Value $defaultDocument
+    Add-WebConfigurationProperty -Filter 'system.webServer/defaultDocument/files' -PSPath 'IIS:\Sites\$siteName' -AtIndex 0 -Name 'Collection' -Value '$defaultDocument'
     Write-Host "Documento por defecto configurado satisfactoriamente: $defaultDocument"
 } catch {
     Write-Error "Error al configurar el documento por defecto: `$_"
