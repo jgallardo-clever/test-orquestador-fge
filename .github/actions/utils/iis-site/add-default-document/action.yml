@@ -27,7 +27,6 @@ runs:
     - name: Ejecutar script de configuración
       run: |
         echo "Ejecutando el script para configurar el documento por defecto en IIS..."
-
-        ssh ${{ inputs.sshUser }}@${{ inputs.ipServer }} "powershell -Command \"Import-Module WebAdministration; Add-WebConfigurationProperty -Filter 'system.webServer/defaultDocument/files' -PSPath 'IIS:\Sites\${{ inputs.siteName }}' -AtIndex 0 -Name 'Collection' -Value '${{ inputs.defaultDocument }}'\""
+        ssh ${{ inputs.sshUser }}@${{ inputs.ipServer }} powershell -Command "Import-Module WebAdministration; Add-WebConfigurationProperty -Filter 'system.webServer/defaultDocument/files' -PSPath 'IIS:\Sites\${{ inputs.siteName }}' -AtIndex 0 -Name 'Collection' -Value '${{ inputs.defaultDocument }}'" 
       shell: powershell
       working-directory: ./orquestador/.github/actions/utils/iis-site/add-default-document
