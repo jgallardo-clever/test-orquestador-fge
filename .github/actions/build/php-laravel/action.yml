@@ -81,7 +81,7 @@ runs:
     - name: Subir artefacto al servidor remoto
       run: |
         # Comprimir el directorio de la aplicación
-        Compress-Archive -Path * -DestinationPath ../${{ steps.get_project_name.outputs.app_name }}.zip
+        # Compress-Archive -Path * -DestinationPath ../${{ steps.get_project_name.outputs.app_name }}.zip
         # Crear directorio de artefactos en el servidor remoto si no existe
         try {
           ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "mkdir C:\artifacts\php-laravel"
@@ -90,6 +90,7 @@ runs:
           exit 1
         }
         # Subir el artefacto al servidor remoto
-        scp ../${{ steps.get_project_name.outputs.app_name }}.zip ${{ inputs.remote_user }}@${{ inputs.server_ip }}:C:\artifacts\php-laravel
+        # Subir el directorio del proyecto al servidor remoto
+        scp -r . ${{ inputs.remote_user }}@${{ inputs.server_ip }}:C:\artifacts\php-laravel\${{ steps.get_project_name.outputs.app_name }}\
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}

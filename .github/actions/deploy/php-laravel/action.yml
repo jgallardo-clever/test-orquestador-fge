@@ -24,11 +24,11 @@ runs:
         echo "Desplegando aplicación PHP Laravel en el servidor remoto"
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\php-laravel\${{ inputs.app_name }}.zip\" \"${{ inputs.project_path }}/${{ inputs.app_name }}\"
 
-        echo "Descompresion de artefacto en el servidor remoto"
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} powershell -Command "Expand-Archive -Path \"${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.app_name }}.zip\" -DestinationPath \"${{ inputs.project_path }}\${{ inputs.app_name }}\" -Force"
+        # echo "Descompresion de artefacto en el servidor remoto"
+        # ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} powershell -Command "Expand-Archive -Path \"${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.app_name }}.zip\" -DestinationPath \"${{ inputs.project_path }}\${{ inputs.app_name }}\" -Force"
 
-        echo "Eliminar archivo ZIP del servidor remoto"
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} del \"${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.app_name }}.zip\"
+        # echo "Eliminar archivo ZIP del servidor remoto"
+        # ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} del \"${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.app_name }}.zip\"
       shell: cmd
 
     - name: Crear App Pool de IIS
