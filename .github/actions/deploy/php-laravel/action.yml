@@ -18,9 +18,6 @@ runs:
   steps:
     - name: Desplegar aplicación PHP Laravel
       run: |
-        echo "Crear directorio para la aplicación en el servidor remoto"
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} mkdir \"${{ inputs.project_path }}/${{ inputs.app_name }}\"
-
         echo "Desplegando aplicación PHP Laravel en el servidor remoto"
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\php-laravel\${{ inputs.app_name }}\" \"${{ inputs.project_path }}\"
       shell: cmd
