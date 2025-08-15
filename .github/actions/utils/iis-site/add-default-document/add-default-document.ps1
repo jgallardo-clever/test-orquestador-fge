@@ -26,17 +26,6 @@ if (-not $ipServer -or -not $sshUser -or -not $siteName -or -not $defaultDocumen
 
 # Cargamos el script remoto que se ejecutará en el servidor IIS
 $remoteScript = @"
-Write-Host "Importamos el modulo WebAdministration para gestionar IIS"
-try {
-    Import-Module WebAdministration
-}
-catch {
-    Write-Error "Error al importar el modulo WebAdministration. Asegurese de que IIS este instalado y el modulo este disponible."
-    return
-}
-
-Write-Host "Configurando el documento por defecto para el sitio: $siteName"
-
 Write-Host "Configuramos el documento por defecto"
 try {
     Add-WebConfigurationProperty -Filter 'system.webServer/defaultDocument/files' -PSPath 'IIS:\Sites\$siteName' -AtIndex 0 -Name 'Collection' -Value '$defaultDocument'
