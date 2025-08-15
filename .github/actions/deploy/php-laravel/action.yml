@@ -39,6 +39,13 @@ runs:
         managed_pipeline_mode: 'Integrated'
         servidor_remoto: '${{ inputs.server_ip }}'
         usuario: '${{ inputs.remote_user }}'
+    
+    - name: Conceder permisos al directorio del proyecto
+      run: |
+        echo "Concediendo permisos al directorio del proyecto en el servidor remoto"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} powershell -Command "icacls '${{ inputs.project_path }}\${{ inputs.app_name }}' /grant 'IIS_IUSRS:(OI)(CI)M'"
+      shell: powershell
+
 
     - name: Crear Sitio en IIS
       uses: ./orquestador/.github/actions/utils/iis-site/create-iis-site
