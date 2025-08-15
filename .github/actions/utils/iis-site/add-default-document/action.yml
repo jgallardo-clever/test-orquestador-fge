@@ -27,6 +27,12 @@ runs:
     - name: Ejecutar script de configuración
       run: |
         echo "Ejecutando el script para configurar el documento por defecto en IIS..."
-        .\add-default-document.ps1 -ipServer '${{ inputs.ipServer }}' -sshUser '${{ inputs.sshUser }}' -siteName '${{ inputs.siteName }}' -defaultDocument '${{ inputs.defaultDocument }}'
+        try {
+            Add-WebConfigurationProperty -Filter 'system.webServer/defaultDocument/files' -PSPath 'IIS:\Sites\${{ inputs.siteName }}' -AtIndex 0 -Name 'Collection' -Value '${{ inputs.defaultDocument }}'
+            Write-Host "Documento por defecto configurado satisfactoriamente: ${{ inputs.defaultDocument }}"
+        } catch {
+            Write-Error "Error al configurar el documento por defecto: `$_"
+            return
+        }
       shell: powershell
       working-directory: ./orquestador/.github/actions/utils/iis-site/add-default-document
