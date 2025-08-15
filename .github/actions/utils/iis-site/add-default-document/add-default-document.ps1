@@ -26,7 +26,6 @@ if (-not $ipServer -or -not $sshUser -or -not $siteName -or -not $defaultDocumen
 
 # Cargamos el script remoto que se ejecutará en el servidor IIS
 $remoteScript = @"
-Write-Host "Configuramos el documento por defecto"
 try {
     Add-WebConfigurationProperty -Filter 'system.webServer/defaultDocument/files' -PSPath 'IIS:\Sites\$siteName' -AtIndex 0 -Name 'Collection' -Value '$defaultDocument'
     Write-Host "Documento por defecto configurado satisfactoriamente: $defaultDocument"
