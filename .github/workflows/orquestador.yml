@@ -37,7 +37,7 @@ jobs:
     runs-on: self-hosted
     if: inputs.requiere_compilar
     outputs:
-      app_name: ${{ steps.build_step_java.outputs.app_name || steps.build_step_net_framework.outputs.app_name || steps.build_step_php_laravel.outputs.app_name }}
+      app_name: ${{ steps.build_step_java.outputs.app_name || steps.build_step_net_framework.outputs.app_name || steps.build_step_php_laravel.outputs.app_name || steps.build_step_node.outputs.app_name }}
       version: ${{ steps.build_step_java.outputs.version || steps.build_step_net_framework.outputs.version }}
       extension: ${{ steps.build_step_java.outputs.extension || steps.build_step_net_framework.outputs.extension }}
     steps:
@@ -96,6 +96,19 @@ jobs:
         if: ${{ inputs.tecnologia == 'php-laravel' }}
         run: |
           echo "Nombre de la aplicación: ${{ steps.build_step_php_laravel.outputs.app_name }}"
+
+      - name: Build Node.js
+        id: build_step_node
+        if: ${{ inputs.tecnologia == 'nodejs' && inputs.despliegue_en == 'IIS' }}
+        uses: ./orquestador/.github/actions/build/nodejs-iis
+        with:
+          server_ip: ${{ secrets.server_ip }}
+          remote_user: ${{ secrets.remote_user }}
+
+      - name: Tomar outputs de la build Node.js
+        if: ${{ inputs.tecnologia == 'nodejs' }}
+        run: |
+          echo "Nombre de la aplicación: ${{ steps.build_step_node.outputs.app_name }}"
 
   test:
     runs-on: self-hosted

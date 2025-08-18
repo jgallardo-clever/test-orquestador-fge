@@ -1,0 +1,64 @@
+name: Action para compilar aplicaciones Node.js para PM2
+description: Esta acción se encarga de compilar aplicaciones Node.js y prepararlas para su despliegue en PM2 con IIS.
+inputs:
+  server_ip: 
+    description: 'Dirección IP del servidor donde se desplegará la aplicación'
+    required: true
+  remote_user:
+    description: 'Usuario para conectarse al servidor remoto'
+    required: true
+outputs:
+  app_name:
+    description: 'Nombre de la aplicación'
+    value: ${{ steps.get_project_name.outputs.app_name }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Buscamos el directorio de la aplicación
+      id: find_project_directory
+      run: |
+        echo "Buscando el directorio del proyecto..."
+
+        # Buscamos el archivo package-lock.json para determinar el directorio del proyecto
+        $projectDir = Get-ChildItem -Recurse -Filter package-lock.json | Select-Object -First 1 | ForEach-Object { $_.DirectoryName }
+        if (-not $projectDir) {
+          Write-Error "No se encontró el archivo package-lock.json"
+          exit 1
+        }
+
+        # Exportamos la variable de entorno con el directorio de la aplicación
+        echo "project_directory=$projectDir" >> $env:GITHUB_OUTPUT
+        
+        echo "Directorio de la aplicación: $projectDir"
+      shell: powershell
+
+    - name: Instalar dependencias de la aplicación en el repositorio
+      run: |
+        echo "Instalando dependencias de npm..."
+        npm install
+      shell: powershell
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
+
+    - name: Obtener el nombre del proyecto usando el nombre del directorio
+      id: get_project_name
+      run: |
+        # Recuperamos el nombre del proyecto considerando el nombre del directorio
+        $rutaActual = Split-Path -Path (Get-Location) -Leaf
+        echo "app_name=$rutaActual" >> $env:GITHUB_OUTPUT
+      shell: powershell
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
+
+    - name: Subir artefacto al servidor remoto
+      run: |
+        echo "Crear directorio de artefactos en el servidor remoto si no existe"
+        try {
+          ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "mkdir C:\artifacts\nodejs"
+        } catch {
+          Write-Error "No se pudo crear el directorio de artefactos en el servidor remoto"
+          exit 1
+        }
+        echo "Subiendo el artefacto al servidor remoto..."
+        scp -r . ${{ inputs.remote_user }}@${{ inputs.server_ip }}:C:\artifacts\nodejs\${{ steps.get_project_name.outputs.app_name }}\
+      shell: powershell
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
+

@@ -48,7 +48,7 @@ runs:
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
-    - name: Obtener el nombre del proyecto desde package-lock.json
+    - name: Obtener el nombre del proyecto usando el nombre del directorio
       id: get_project_name
       run: |
         # Recuperamos el nombre del proyecto considerando el nombre del directorio
@@ -59,7 +59,7 @@ runs:
 
     - name: Configurar base de datos
       run: |
-        # Configurar base de datos sqlite si no está configurada
+        echo "Configurar base de datos sqlite si no está configurada"
         # Acá vamos a tener una lógica diferente dependiendo de la implementación
         pwd
         php artisan migrate --force
@@ -68,11 +68,9 @@ runs:
 
     - name: Crear .env
       run: |
-        # Crear .env
         echo "Creando archivo .env..."
         cp .env.example .env
         echo "Archivo .env creado."
-        # Agregar variables de entorno necesarias
         (Get-Content .env) -replace '^APP_KEY=.*', "APP_KEY=${{ inputs.app_key }}" | Set-Content .env
         (Get-Content .env) -replace '^APP_URL=.*', "APP_URL=${{ inputs.app_url }}" | Set-Content .env
       shell: powershell
@@ -80,17 +78,14 @@ runs:
 
     - name: Subir artefacto al servidor remoto
       run: |
-        # Comprimir el directorio de la aplicación
-        # Compress-Archive -Path * -DestinationPath ../${{ steps.get_project_name.outputs.app_name }}.zip
-        # Crear directorio de artefactos en el servidor remoto si no existe
+        echo "Crear directorio de artefactos en el servidor remoto si no existe"
         try {
           ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "mkdir C:\artifacts\php-laravel"
         } catch {
           Write-Error "No se pudo crear el directorio de artefactos en el servidor remoto"
           exit 1
         }
-        # Subir el artefacto al servidor remoto
-        # Subir el directorio del proyecto al servidor remoto
+        echo "Subiendo el artefacto al servidor remoto..."
         scp -r . ${{ inputs.remote_user }}@${{ inputs.server_ip }}:C:\artifacts\php-laravel\${{ steps.get_project_name.outputs.app_name }}\
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
