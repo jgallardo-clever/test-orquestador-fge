@@ -168,3 +168,12 @@ jobs:
           remote_user: ${{ secrets.REMOTE_USER }}
           project_path: '${{ secrets.PROJECT_PATH }}'
           app_name: test-app
+
+      - name: Deploy Node.js IIS
+        if: ${{ inputs.tecnologia == 'nodejs' && inputs.despliegue_en == 'IIS' }}
+        uses: ./orquestador/.github/actions/deploy/nodejs-iis
+        with:
+          server_ip: ${{ secrets.SERVER_IP }}
+          remote_user: ${{ secrets.REMOTE_USER }}
+          project_path: '${{ secrets.PROJECT_PATH }}'
+          app_name: ${{ needs.build.outputs.app_name }}
