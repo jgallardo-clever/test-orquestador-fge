@@ -39,6 +39,13 @@ runs:
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
+    - name: Buildear aplicación
+      run: |
+        echo "Buildeando aplicación"
+        npm run build
+      shell: powershell
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
+
     - name: Obtener el nombre del proyecto usando el nombre del directorio
       id: get_project_name
       run: |
@@ -58,7 +65,7 @@ runs:
           exit 1
         }
         echo "Subiendo el artefacto al servidor remoto..."
-        scp -r . ${{ inputs.remote_user }}@${{ inputs.server_ip }}:C:\artifacts\nodejs\${{ steps.get_project_name.outputs.app_name }}\
+        scp -r dist/ ${{ inputs.remote_user }}@${{ inputs.server_ip }}:C:\artifacts\nodejs\${{ steps.get_project_name.outputs.app_name }}\
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
