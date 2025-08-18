@@ -126,7 +126,7 @@ jobs:
 
   deploy:
     runs-on: self-hosted
-    # needs: [build, test]
+    needs: [build, test]
     steps:
       - name: Checkout orquestador repository
         uses: actions/checkout@v4
