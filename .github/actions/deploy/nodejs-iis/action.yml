@@ -42,7 +42,7 @@ runs:
       with:
         site_name: '${{ inputs.app_name }}'
         app_pool_name: '${{ inputs.app_name }}-app-pool'
-        physical_path: '${{ inputs.project_path }}\${{ inputs.app_name }}\public'
+        physical_path: '${{ inputs.project_path }}\${{ inputs.app_name }}'
         host_header: 'localhost'
         port: '80'
         # ip_address: '${{ inputs.ip_address }}'
@@ -52,7 +52,7 @@ runs:
     - name: Iniciar aplicación con PM2
       run: |
         echo "Iniciando aplicación..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "pm2 start ${{ inputs.project_path }}\${{ inputs.app_name }}\dist\server.js --name ${{ inputs.app_name }}"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "pm2 start ${{ inputs.project_path }}\${{ inputs.app_name }}\main.js"
       shell: powershell
 
     - name: Configurar proxy inverso en IIS
