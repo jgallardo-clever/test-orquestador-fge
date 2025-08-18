@@ -1,0 +1,64 @@
+name: Action para desplegar aplicaciones Node.js en IIS
+description: Esta acción se encarga de desplegar aplicaciones Node.js en un servidor IIS.
+inputs:
+  server_ip:
+    description: 'Dirección IP del servidor donde se desplegará la aplicación'
+    required: true
+  remote_user:
+    description: 'Usuario para conectarse al servidor remoto'
+    required: true
+  app_name:
+    description: 'Nombre de la aplicación'
+    required: true
+  project_path:
+    description: 'Ruta de la aplicación en el servidor'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Desplegar aplicación en IIS
+      run: |
+        echo "Desplegando aplicación en IIS..."
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\nodejs\${{ inputs.app_name }}\" \"${{ inputs.project_path }}/\"
+      shell: cmd
+
+    - name: Crear App Pool de IIS
+      uses: ./orquestador/.github/actions/utils/application-pool/create-app-pool
+      with:
+        app_pool_name: '${{ inputs.app_name }}-app-pool'
+        managed_runtime_version: 'v4.0'
+        managed_pipeline_mode: 'Integrated'
+        servidor_remoto: '${{ inputs.server_ip }}'
+        usuario: '${{ inputs.remote_user }}'
+
+    - name: Conceder permisos al directorio del proyecto
+      run: |
+        echo "Concediendo permisos al directorio del proyecto en el servidor remoto"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} powershell -Command "icacls '${{ inputs.project_path }}\${{ inputs.app_name }}' /grant 'IIS_IUSRS:(OI)(CI)M'"
+      shell: powershell
+
+    - name: Crear Sitio en IIS
+      uses: ./orquestador/.github/actions/utils/iis-site/create-iis-site
+      with:
+        site_name: '${{ inputs.app_name }}'
+        app_pool_name: '${{ inputs.app_name }}-app-pool'
+        physical_path: '${{ inputs.project_path }}\${{ inputs.app_name }}\public'
+        host_header: 'localhost'
+        port: '80'
+        # ip_address: '${{ inputs.ip_address }}'
+        servidor_remoto: '${{ inputs.server_ip }}'
+        usuario: '${{ inputs.remote_user }}'
+
+    - name: Iniciar aplicación con PM2
+      run: |
+        echo "Iniciando aplicación..."
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "pm2 start ${{ inputs.project_path }}\${{ inputs.app_name }}\dist\server.js --name ${{ inputs.app_name }}"
+      shell: powershell
+
+    - name: Configurar proxy inverso en IIS
+      uses: ./orquestador/.github/actions/utils/iis-site/setup-reverse-proxy
+      with:
+        site_name: '${{ inputs.app_name }}'
+        target_url: 'http://localhost:3000'
+        servidor_remoto: '${{ inputs.server_ip }}'
+        usuario: '${{ inputs.remote_user }}'
