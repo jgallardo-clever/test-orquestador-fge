@@ -40,6 +40,7 @@ jobs:
       app_name: ${{ steps.build_step_java.outputs.app_name || steps.build_step_net_framework.outputs.app_name || steps.build_step_php_laravel.outputs.app_name || steps.build_step_node.outputs.app_name }}
       version: ${{ steps.build_step_java.outputs.version || steps.build_step_net_framework.outputs.version }}
       extension: ${{ steps.build_step_java.outputs.extension || steps.build_step_net_framework.outputs.extension }}
+      start_command: ${{ steps.build_step_node.outputs.start_command || '' }}
     steps:
       - name: Checkout app repository
         uses: actions/checkout@v4
@@ -177,3 +178,4 @@ jobs:
           remote_user: ${{ secrets.REMOTE_USER }}
           project_path: '${{ secrets.PROJECT_PATH }}'
           app_name: ${{ needs.build.outputs.app_name }}
+          start_command: ${{ needs.build.outputs.start_command }}

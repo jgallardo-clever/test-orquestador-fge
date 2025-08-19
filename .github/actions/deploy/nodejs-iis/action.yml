@@ -13,6 +13,9 @@ inputs:
   project_path:
     description: 'Ruta de la aplicación en el servidor'
     required: true
+  start_command:
+    description: 'Comando para iniciar la aplicación con PM2'
+    required: true
 runs:
   using: 'composite'
   steps:
@@ -52,7 +55,7 @@ runs:
     - name: Iniciar aplicación con PM2
       run: |
         echo "Iniciando aplicación..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "pm2 start ${{ inputs.project_path }}\${{ inputs.app_name }}\dist\main.js"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "pm2 start ${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.start_command }}"
       shell: powershell
 
     - name: Configurar proxy inverso en IIS
