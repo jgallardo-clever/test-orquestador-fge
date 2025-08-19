@@ -22,7 +22,7 @@ runs:
     - name: Desplegar aplicación en IIS
       run: |
         echo "Eliminar proceso pm2..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "pm2 delete ${{ inputs.app_name }}"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "set PM2_HOME=\"C:\Users\${{ inputs.remote_user }}\.pm2_daemon_${{ inputs.app_name }}\" && pm2 delete ${{ inputs.app_name }}"
         echo "Desplegando aplicación en IIS..."
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\nodejs\${{ inputs.app_name }}\" \"${{ inputs.project_path }}\"
       shell: cmd
@@ -57,7 +57,7 @@ runs:
     - name: Iniciar aplicación con PM2
       run: |
         echo "Iniciando aplicación..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "pm2 start \"${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.start_command }}\" --name ${{ inputs.app_name }}"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "set PM2_HOME=\"C:\Users\${{ inputs.remote_user }}\.pm2_daemon_${{ inputs.app_name }}\" && pm2 start \"${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.start_command }}\" --name ${{ inputs.app_name }}"
       shell: powershell
 
     - name: Configurar proxy inverso en IIS
