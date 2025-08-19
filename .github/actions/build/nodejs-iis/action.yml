@@ -42,7 +42,11 @@ runs:
     - name: Buildear aplicación
       run: |
         echo "Buildeando aplicación"
-        npm run build
+        try {
+          npm run build
+        } catch {
+          Write-Error "No se realizó buildeo de la aplicación"
+        }
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
