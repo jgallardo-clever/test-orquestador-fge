@@ -87,8 +87,10 @@ runs:
           Write-Error "No se encontró un comando de inicio válido en package.json"
           exit 1
         }
-        # Quitar "node", "." y cambiar "/" por "\"
+        # Quitar "node", ".", cambiar "/" por "\" y eliminar el primer "\"
         $startCommand = $startCommand -replace 'node', '' -replace '\.', '' -replace '/', '\'
+        $startCommand = $startCommand.Trim()
+        $startCommand = $startCommand.TrimStart('\')
         $startCommand = $startCommand.Trim()
         echo "Comando/Ruta de inicio: $startCommand"
         echo "start_command=$startCommand" >> $env:GITHUB_OUTPUT
