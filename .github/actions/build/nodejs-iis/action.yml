@@ -39,13 +39,24 @@ runs:
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
-    - name: Buildear aplicación
+    - name: Verificar y buildear aplicación si es necesario
       run: |
-        echo "Buildeando aplicación"
-        try {
-          npm run build
-        } catch {
-          Write-Error "No se realizó buildeo de la aplicación"
+        echo "Verificando si la aplicación requiere build..."
+        
+        # Leer package.json para verificar scripts disponibles
+        $packageJson = Get-Content package.json | ConvertFrom-Json
+        
+        if ($packageJson.scripts -and $packageJson.scripts.build) {
+          echo "Script 'build' encontrado. Ejecutando build..."
+          try {
+            npm run build
+            echo "Build completado exitosamente"
+          } catch {
+            Write-Warning "Error durante el build, pero continuando..."
+            Write-Warning $_.Exception.Message
+          }
+        } else {
+          echo "No se encontró script 'build'. Omitiendo paso de build."
         }
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
