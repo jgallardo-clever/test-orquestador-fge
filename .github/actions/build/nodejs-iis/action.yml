@@ -65,7 +65,7 @@ runs:
           exit 1
         }
         echo "Subiendo el artefacto al servidor remoto..."
-        scp -r dist/ ${{ inputs.remote_user }}@${{ inputs.server_ip }}:C:\artifacts\nodejs\${{ steps.get_project_name.outputs.app_name }}\
+        scp -r . ${{ inputs.remote_user }}@${{ inputs.server_ip }}:C:\artifacts\nodejs\${{ steps.get_project_name.outputs.app_name }}\
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
