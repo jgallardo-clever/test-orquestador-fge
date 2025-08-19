@@ -19,7 +19,7 @@ runs:
     - name: Desplegar aplicación en IIS
       run: |
         echo "Desplegando aplicación en IIS..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\nodejs\${{ inputs.app_name }}\" \"${{ inputs.project_path }}/\"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\nodejs\${{ inputs.app_name }}\" \"${{ inputs.project_path }}\\"
       shell: cmd
 
     - name: Crear App Pool de IIS
