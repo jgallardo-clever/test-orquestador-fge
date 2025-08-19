@@ -23,6 +23,8 @@ runs:
       run: |
         echo "Eliminar proceso pm2..."
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} rmdir /s /q \"C:\Users\${{ inputs.remote_user }}\.pm2_daemon_${{ inputs.app_name }} \\"
+        echo "Eliminando directorio de la aplicación..."
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} rmdir /s /q \"${{ inputs.project_path }}\${{ inputs.app_name }}\"
         echo "Desplegando aplicación en IIS..."
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\nodejs\${{ inputs.app_name }}\" \"${{ inputs.project_path }}\"
       shell: cmd
