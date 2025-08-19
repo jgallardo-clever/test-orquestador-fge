@@ -110,6 +110,7 @@ jobs:
         if: ${{ inputs.tecnologia == 'nodejs' }}
         run: |
           echo "Nombre de la aplicación: ${{ steps.build_step_node.outputs.app_name }}"
+          echo "Ruta de inicio: ${{ steps.build_step_node.outputs.start_command }}"
 
   test:
     runs-on: self-hosted

@@ -11,6 +11,9 @@ outputs:
   app_name:
     description: 'Nombre de la aplicación'
     value: ${{ steps.get_project_name.outputs.app_name }}
+  start_command:
+    description: 'Comando de inicio de la aplicación'
+    value: ${{ steps.get_start_command.outputs.start_command }}
 runs:
   using: 'composite'
   steps:
