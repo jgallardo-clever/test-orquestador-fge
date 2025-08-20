@@ -89,15 +89,26 @@ runs:
           Write-Error "No se encontró un comando de inicio válido en package.json"
           exit 1
         }
-        # Quitar "node", ".", cambiar "/" por "\" y eliminar el primer "\"
-        $startCommand = $startCommand -replace 'node', '' -replace '/', '\'
-        $startCommand = $startCommand.Trim()
-        $startCommand = $startCommand.TrimStart('.')
-        $startCommand = $startCommand.Trim()
-        $startCommand = $startCommand.TrimStart('\')
-        $startCommand = $startCommand.Trim()
-        echo "Comando/Ruta de inicio: $startCommand"
-        echo "start_command=$startCommand" >> $env:GITHUB_OUTPUT
+
+        # Si no tiene "node", la variable será ""
+        if (-not $startCommand) {
+          $startCommand = ""
+          echo "No posee script de producción con node, por lo que utilizaremos el directorio build con serve en pm2"
+          echo "start_command=$startCommand" >> $env:GITHUB_OUTPUT
+        }
+        else {
+          # Quitar "node", ".", cambiar "/" por "\" y eliminar el primer "\"
+          $startCommand = $startCommand -replace 'node', '' -replace '/', '\'
+          $startCommand = $startCommand.Trim()
+          $startCommand = $startCommand.TrimStart('.')
+          $startCommand = $startCommand.Trim()
+          $startCommand = $startCommand.TrimStart('\')
+          $startCommand = $startCommand.Trim()
+          echo "Comando/Ruta de inicio: $startCommand"
+          echo "start_command=$startCommand" >> $env:GITHUB_OUTPUT
+        }
+
+        
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
