@@ -90,7 +90,9 @@ runs:
           exit 1
         }
         # Quitar "node", ".", cambiar "/" por "\" y eliminar el primer "\"
-        $startCommand = $startCommand -replace 'node', '' -replace '\.', '' -replace '/', '\'
+        $startCommand = $startCommand -replace 'node', '' -replace '/', '\'
+        $startCommand = $startCommand.Trim()
+        $startCommand = $startCommand.TrimStart('.')
         $startCommand = $startCommand.Trim()
         $startCommand = $startCommand.TrimStart('\')
         $startCommand = $startCommand.Trim()
