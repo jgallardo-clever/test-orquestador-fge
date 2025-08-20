@@ -90,9 +90,9 @@ runs:
           exit 1
         }
 
-        # Si no tiene "node" en $startCommand, la variable será ""
+        # Si no tiene "node" en $startCommand, la variable será "no"
         if ($startCommand -notmatch 'node') {
-          $startCommand = ""
+          $startCommand = "no"
           echo "No posee script de producción con node, por lo que utilizaremos el directorio build con serve en pm2"
           echo "start_command=$startCommand" >> $env:GITHUB_OUTPUT
         }
