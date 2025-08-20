@@ -97,6 +97,13 @@ runs:
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
+    - name: Optimizar artefacto para despliegue
+      run: |
+        echo "Limpiando artefacto..."
+        rmdir /s /q node_modules
+      shell: cmd
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
+
     - name: Subir artefacto al servidor remoto
       run: |
         echo "Crear directorio de artefactos en el servidor remoto si no existe"
@@ -106,9 +113,6 @@ runs:
           Write-Error "No se pudo crear el directorio de artefactos en el servidor remoto"
           exit 1
         }
-        echo "Limpiar artefacto..."
-        rmdir /s /q node_modules
-        rmdir /s /q .git
         echo "Subiendo el artefacto al servidor remoto..."
         scp -r . ${{ inputs.remote_user }}@${{ inputs.server_ip }}:C:\artifacts\nodejs\${{ steps.get_project_name.outputs.app_name }}\
       shell: powershell
