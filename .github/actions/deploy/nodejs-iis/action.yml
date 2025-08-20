@@ -64,7 +64,7 @@ runs:
         echo "  - Comando de inicio: ${{ inputs.start_command }}"
         echo "  - Ruta completa: ${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.start_command }}"
         echo "Iniciando aplicación..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "set PM2_HOME=C:\Users\${{ inputs.remote_user }}\.pm2_daemon_${{ inputs.app_name }} && pm2 start ${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.start_command }} --name ${{ inputs.app_name }} && pm2 save"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "setx PM2_HOME=C:\Users\${{ inputs.remote_user }}\.pm2_daemon_${{ inputs.app_name }} && pm2 start ${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.start_command }} --name ${{ inputs.app_name }} && pm2 save"
       shell: powershell
 
     - name: Configurar proxy inverso en IIS
