@@ -21,6 +21,8 @@ runs:
   steps:
     - name: Desplegar aplicación en IIS
       run: |
+        echo "Instalar dependencias npm..."
+        npm install
         echo "Eliminar proceso pm2..."
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} pm2 stop ${{ inputs.app_name }}
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} pm2 delete ${{ inputs.app_name }}
