@@ -69,7 +69,7 @@ runs:
         echo "Iniciando aplicación..."
         # Si la variable start_command es "", entonces iniciamos con pm2 serve
         if (${{ inputs.start_command }} -eq "") {
-          ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "pm2 serve ${{ inputs.project_path }}\${{ inputs.app_name }}\build --name ${{ inputs.app_name }}"
+          ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "pm2 serve ${{ inputs.project_path }}\${{ inputs.app_name }}\build 3000 --name ${{ inputs.app_name }}"
         } else {
           ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "pm2 start ${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.start_command }} --name ${{ inputs.app_name }}"
         }
