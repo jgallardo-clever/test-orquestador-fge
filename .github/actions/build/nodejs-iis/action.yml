@@ -83,6 +83,8 @@ runs:
           $startCommand = $packageJson.scripts.'start:prod'
         } elseif ($packageJson.scripts.start) {
           $startCommand = $packageJson.scripts.start
+        } elseif ($packageJson.scripts.'serve:ssr:app-angular') {
+          $startCommand = $packageJson.scripts.'serve:ssr:app-angular'
         } else {
           Write-Error "No se encontró un comando de inicio válido en package.json"
           exit 1
