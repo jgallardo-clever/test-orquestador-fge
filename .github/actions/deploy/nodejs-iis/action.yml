@@ -22,7 +22,8 @@ runs:
     - name: Desplegar aplicación en IIS
       run: |
         echo "Eliminar proceso pm2..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} pm2 stop ${{ inputs.app_name }} && pm2 delete ${{ inputs.app_name }}
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} pm2 stop ${{ inputs.app_name }}
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} pm2 delete ${{ inputs.app_name }}
         echo "Eliminando directorio de la aplicación..."
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} rmdir /s /q \"${{ inputs.project_path }}\${{ inputs.app_name }}\"
         echo "Desplegando aplicación en IIS..."
@@ -64,7 +65,7 @@ runs:
         echo "  - Comando de inicio: ${{ inputs.start_command }}"
         echo "  - Ruta completa: ${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.start_command }}"
         echo "Iniciando aplicación..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "pm2 start ${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.start_command }} --name ${{ inputs.app_name }} && pm2 save"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "pm2 start ${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.start_command }} --name ${{ inputs.app_name }}"
       shell: powershell
 
     - name: Configurar proxy inverso en IIS
