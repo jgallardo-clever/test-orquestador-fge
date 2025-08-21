@@ -18,6 +18,8 @@ runs:
   steps:
     - name: Desplegar aplicación PHP Laravel
       run: |
+        echo "Instalar dependencias npm y composer..."
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "cd C:\artifacts\nodejs\${{ inputs.app_name }} && npm install && composer install"
         echo "Desplegando aplicación PHP Laravel en el servidor remoto"
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\php-laravel\${{ inputs.app_name }}\" \"${{ inputs.project_path }}/\"
       shell: cmd
