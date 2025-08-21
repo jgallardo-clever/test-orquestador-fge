@@ -39,6 +39,15 @@ runs:
       shell: powershell
       working-directory: ./app
 
+    - name: Instalar dependencias de la aplicación en el repositorio
+      run: |
+        echo "Instalando dependencias de composer..."
+        composer install
+        echo "Instalando dependencias de npm..."
+        npm install
+      shell: powershell
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
+
     - name: Obtener el nombre del proyecto usando el nombre del directorio
       id: get_project_name
       run: |
@@ -69,6 +78,8 @@ runs:
 
     - name: Subir artefacto al servidor remoto
       run: |
+        echo "Eliminamos el directorio node_modules si existe"
+        rmdir /s /q node_modules
         echo "Crear directorio de artefactos en el servidor remoto si no existe"
         try {
           ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "mkdir C:\artifacts\php-laravel"
