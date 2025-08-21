@@ -55,8 +55,6 @@ runs:
         if ($packageJson.scripts -and $packageJson.scripts.build) {
           echo "Script 'build' encontrado. Ejecutando build..."
           try {
-            $env:PORT = "${{ inputs.app_port }}"
-            $env:NODE_PORT = "${{ inputs.app_port }}"
             npm run build
             echo "Build completado exitosamente"
           } catch {

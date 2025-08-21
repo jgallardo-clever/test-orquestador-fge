@@ -109,7 +109,6 @@ jobs:
         with:
           server_ip: ${{ secrets.server_ip }}
           remote_user: ${{ secrets.remote_user }}
-          app_port: ${{ secrets.app_port }}
 
       - name: Tomar outputs de la build Node.js
         if: ${{ inputs.tecnologia == 'nodejs' }}
