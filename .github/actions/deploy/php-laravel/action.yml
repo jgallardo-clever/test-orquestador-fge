@@ -19,7 +19,9 @@ runs:
     - name: Desplegar aplicación PHP Laravel
       run: |
         echo "Instalar dependencias npm y composer..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "cd C:\artifacts\nodejs\${{ inputs.app_name }} && npm install && composer install"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "cd C:\artifacts\nodejs\${{ inputs.app_name }} && npm install && composer install --no-dev"
+        echo "Configuramos la base de datos sqlite"
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "cd C:\artifacts\php-laravel\${{ inputs.app_name }} && php artisan migrate --force"
         echo "Desplegando aplicación PHP Laravel en el servidor remoto"
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\php-laravel\${{ inputs.app_name }}\" \"${{ inputs.project_path }}/\"
       shell: cmd
@@ -38,7 +40,6 @@ runs:
         echo "Concediendo permisos al directorio del proyecto en el servidor remoto"
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} powershell -Command "icacls '${{ inputs.project_path }}\${{ inputs.app_name }}' /grant 'IIS_IUSRS:(OI)(CI)M'"
       shell: powershell
-
 
     - name: Crear Sitio en IIS
       uses: ./orquestador/.github/actions/utils/iis-site/create-iis-site

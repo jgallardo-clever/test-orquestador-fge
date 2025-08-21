@@ -42,7 +42,7 @@ runs:
     - name: Instalar dependencias de la aplicación en el repositorio
       run: |
         echo "Instalando dependencias de composer..."
-        composer install
+        composer install --no-dev
         echo "Instalando dependencias de npm..."
         npm install
       shell: powershell
@@ -54,15 +54,6 @@ runs:
         # Recuperamos el nombre del proyecto considerando el nombre del directorio
         $rutaActual = Split-Path -Path (Get-Location) -Leaf
         echo "app_name=$rutaActual" >> $env:GITHUB_OUTPUT
-      shell: powershell
-      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
-
-    - name: Configurar base de datos
-      run: |
-        echo "Configurar base de datos sqlite si no está configurada"
-        # Acá vamos a tener una lógica diferente dependiendo de la implementación
-        pwd
-        php artisan migrate --force
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
@@ -80,6 +71,8 @@ runs:
       run: |
         echo "Eliminamos el directorio node_modules si existe"
         rmdir /s /q node_modules
+        rmdir /s /q vendor
+        rmdir /s /q storage/logs
       shell: cmd
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
