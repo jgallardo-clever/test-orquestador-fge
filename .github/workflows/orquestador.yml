@@ -32,6 +32,10 @@ on:
         description: 'Ruta del proyecto en el servidor remoto'
         required: false
 
+      app_port:
+        description: 'Puerto de la aplicación'
+        required: false
+
 jobs:
   build:
     runs-on: self-hosted
@@ -105,6 +109,7 @@ jobs:
         with:
           server_ip: ${{ secrets.server_ip }}
           remote_user: ${{ secrets.remote_user }}
+          app_port: ${{ secrets.app_port }}
 
       - name: Tomar outputs de la build Node.js
         if: ${{ inputs.tecnologia == 'nodejs' }}
@@ -180,3 +185,4 @@ jobs:
           project_path: '${{ secrets.PROJECT_PATH }}'
           app_name: ${{ needs.build.outputs.app_name }}
           start_command: ${{ needs.build.outputs.start_command }}
+          app_port: ${{ secrets.APP_PORT }}
