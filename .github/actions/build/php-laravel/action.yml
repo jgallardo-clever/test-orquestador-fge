@@ -69,10 +69,9 @@ runs:
 
     - name: Limpiar directorio
       run: |
-        echo "Eliminamos el directorio node_modules si existe"
+        echo "Eliminamos el directorio node_modules y vendor"
         rmdir /s /q node_modules
         rmdir /s /q vendor
-        rmdir /s /q storage/logs
       shell: cmd
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
 
