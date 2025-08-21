@@ -22,6 +22,8 @@ runs:
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "cd C:\artifacts\php-laravel\${{ inputs.app_name }} && npm install && composer install --no-dev"
         echo "Configuramos la base de datos sqlite"
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "cd C:\artifacts\php-laravel\${{ inputs.app_name }} && php artisan migrate --force"
+        echo "Eliminando directorio de la aplicación..."
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} rmdir /s /q \"${{ inputs.project_path }}\${{ inputs.app_name }}\"
         echo "Desplegando aplicación PHP Laravel en el servidor remoto"
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\php-laravel\${{ inputs.app_name }}\" \"${{ inputs.project_path }}\"
       shell: cmd
