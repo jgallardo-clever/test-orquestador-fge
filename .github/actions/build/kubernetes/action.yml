@@ -1,0 +1,57 @@
+name: Action para desplegar aplicaciones en Kubernetes AKS
+description: Esta acción se encarga de desplegar aplicaciones en un clúster de Kubernetes AKS.
+inputs:
+  temp:
+    description: Variable temporal mientras defino los inputs
+    required: true
+  app_name:
+    description: Nombre de la imagen Docker
+    required: true
+  username:
+    description: Nombre de usuario para el container registry
+    required: true
+  password:
+    description: Contraseña para el container registry
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Buscar Dockerfile y buildear imagen Docker
+      run: |
+        echo "Buscando Dockerfile..."
+        if (Test-Path -Path './Dockerfile') {
+          echo "Dockerfile encontrado. Procediendo a construir la imagen Docker..."
+          docker build -t ${{ inputs.app_name }} .
+        } else {
+          echo "Dockerfile no encontrado. Abortando."
+          exit 1
+        }
+      shell: powershell
+      working-directory: ./app
+
+    - name: Subir imagen a un container registry
+      run: |
+        echo "Subiendo imagen Docker al container registry..."
+        docker login -u ${{ inputs.username }} -p ${{ inputs.password }}
+        docker push ${{ inputs.app_name }}
+      shell: powershell
+      working-directory: ./app
+
+    - name: Configurar credenciales AKS
+      run: |
+        echo "Configurando credenciales de AKS..."
+        # Acá van los comandos de Azure Powershell
+      shell: powershell
+      working-directory: ./app
+
+    - name: Obtener contexto AKS
+      run: |
+        echo "Obteniendo contexto de AKS..."
+      shell: powershell
+      working-directory: ./app
+
+    - name: Configurar Deployment
+      run: |
+        echo "Configurando Deployment de Kubernetes..."
+      shell: powershell
+      working-directory: ./app
