@@ -74,7 +74,7 @@ runs:
         if ("${{ inputs.start_command }}" -eq "-") {
           ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "pm2 serve ${{ inputs.project_path }}\${{ inputs.app_name }}\build ${{ inputs.app_port }} --name ${{ inputs.app_name }}"
         } else {
-          ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "$set PORT=${{ inputs.app_port }} && set NODE_PORT=${{ inputs.app_port }} && pm2 start ${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.start_command }} --name ${{ inputs.app_name }}"
+          ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} "set PORT=${{ inputs.app_port }} && set NODE_PORT=${{ inputs.app_port }} && pm2 start ${{ inputs.project_path }}\${{ inputs.app_name }}\${{ inputs.start_command }} --name ${{ inputs.app_name }}"
         }
       shell: powershell
 
