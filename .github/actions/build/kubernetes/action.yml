@@ -21,8 +21,8 @@ runs:
       run: |
         echo "Buscando Dockerfile..."
         if (Test-Path -Path './Dockerfile') {
-          echo "Dockerfile encontrado. Procediendo a construir la imagen Docker con el nombre $app_name..."
-          docker build -t $app_name . --no-cache
+          echo "Dockerfile encontrado. Procediendo a construir la imagen Docker con el nombre ${{ steps.export.outputs.app_name }}..."
+          docker build -t ${{ steps.export.outputs.app_name }} . --no-cache
         } else {
           echo "Dockerfile no encontrado. Abortando."
           exit 1
@@ -33,7 +33,6 @@ runs:
     - name: Subir imagen a un container registry (http://localhost:5000)
       run: |
         echo "Subiendo imagen Docker al container registry..."
-        # docker login -u ${{ inputs.username }} -p ${{ inputs.password }}
-        docker push http://localhost:5000/${{ inputs.app_name }}
+        docker push http://localhost:5000/${{ steps.export.outputs.app_name }}
       shell: powershell
       working-directory: ./app
