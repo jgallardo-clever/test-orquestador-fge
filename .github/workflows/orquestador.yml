@@ -149,6 +149,10 @@ jobs:
         with:
           repository: jgallardo-clever/test-orquestador-fge
           path: orquestador
+      - name: Checkout app repository
+        uses: actions/checkout@v4
+        with:
+          path: app
       - name: Información del entorno a desplegar
         run: |
           echo "Rama: ${{ inputs.rama }}"
