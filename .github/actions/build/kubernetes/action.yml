@@ -12,7 +12,7 @@ runs:
       run: |
         echo "Exportando nombre de la imagen..."
         $app_name = (Get-Content -Path .\k8s\deployment.yaml | Select-String -Pattern "name:").Line.Split(':')[1].Trim()
-        echo "app_name=$app_name" >> $GITHUB_ENV
+        echo "app_name=$app_name" >> $env:GITHUB_OUTPUT
         echo "Nombre de la imagen: $app_name"
       shell: powershell
       working-directory: ./app
