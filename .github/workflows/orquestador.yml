@@ -41,7 +41,7 @@ jobs:
     runs-on: self-hosted
     if: inputs.requiere_compilar
     outputs:
-      app_name: ${{ steps.build_step_java.outputs.app_name || steps.build_step_net_framework.outputs.app_name || steps.build_step_php_laravel.outputs.app_name || steps.build_step_node.outputs.app_name }}
+      app_name: ${{ steps.build_step_java.outputs.app_name || steps.build_step_net_framework.outputs.app_name || steps.build_step_php_laravel.outputs.app_name || steps.build_step_node.outputs.app_name || steps.build_step_kubernetes.outputs.app_name }}
       version: ${{ steps.build_step_java.outputs.version || steps.build_step_net_framework.outputs.version }}
       extension: ${{ steps.build_step_java.outputs.extension || steps.build_step_net_framework.outputs.extension }}
       start_command: ${{ steps.build_step_node.outputs.start_command || '' }}
@@ -116,6 +116,19 @@ jobs:
           echo "Nombre de la aplicación: ${{ steps.build_step_node.outputs.app_name }}"
           echo "Ruta de inicio: ${{ steps.build_step_node.outputs.start_command }}"
 
+      - name: Build Kubernetes
+        id: build_step_kubernetes
+        if: ${{ inputs.tecnologia == 'kubernetes' }}
+        uses: ./orquestador/.github/actions/build/kubernetes
+        with:
+          server_ip: ${{ secrets.server_ip }}
+          remote_user: ${{ secrets.remote_user }}
+
+      - name: Tomar outputs de la build Kubernetes
+        if: ${{ inputs.tecnologia == 'kubernetes' }}
+        run: |
+          echo "Nombre de la aplicación: ${{ steps.build_step_kubernetes.outputs.app_name }}"
+
   test:
     runs-on: self-hosted
     needs: build
@@ -185,3 +198,11 @@ jobs:
           app_name: ${{ needs.build.outputs.app_name }}
           start_command: ${{ needs.build.outputs.start_command }}
           app_port: ${{ secrets.APP_PORT }}
+
+      - name: Deploy Kubernetes
+        if: ${{ inputs.tecnologia == 'kubernetes' }}
+        uses: ./orquestador/.github/actions/deploy/kubernetes
+        with:
+          server_ip: ${{ secrets.SERVER_IP }}
+          remote_user: ${{ secrets.REMOTE_USER }}
+          app_name: ${{ needs.build.outputs.app_name }}

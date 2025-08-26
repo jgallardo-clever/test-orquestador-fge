@@ -1,11 +1,8 @@
-name: Action para desplegar aplicaciones en Kubernetes AKS
-description: Esta acción se encarga de desplegar aplicaciones en un clúster de Kubernetes AKS.
+name: Action para buildear aplicaciones en Kubernetes AKS
+description: Esta acción se encarga de buildear aplicaciones en un clúster de Kubernetes AKS.
 inputs:
   temp:
     description: Variable temporal mientras defino los inputs
-    required: true
-  app_name:
-    description: Nombre de la imagen Docker
     required: true
   username:
     description: Nombre de usuario para el container registry
@@ -13,9 +10,21 @@ inputs:
   password:
     description: Contraseña para el container registry
     required: true
+outputs:
+  app_name:
+    description: Nombre de la imagen Docker
+    value: ${{ steps.export.outputs.app_name }}
 runs:
   using: "composite"
   steps:
+    - name: Exportar nombre de la imagen
+      id: export
+      run: |
+        echo "Exportando nombre de la imagen..."
+        $app_name = (Get-Content -Path .\deployment.yaml | Select-String -Pattern "name:").Line.Split(':')[1].Trim()
+        echo "app_name=$app_name" >> $GITHUB_ENV
+      shell: powershell
+
     - name: Buscar Dockerfile y buildear imagen Docker
       run: |
         echo "Buscando Dockerfile..."
@@ -29,29 +38,10 @@ runs:
       shell: powershell
       working-directory: ./app
 
-    - name: Subir imagen a un container registry
+    - name: Subir imagen a un container registry (http://localhost:5000)
       run: |
         echo "Subiendo imagen Docker al container registry..."
-        docker login -u ${{ inputs.username }} -p ${{ inputs.password }}
-        docker push ${{ inputs.app_name }}
-      shell: powershell
-      working-directory: ./app
-
-    - name: Configurar credenciales AKS
-      run: |
-        echo "Configurando credenciales de AKS..."
-        # Acá van los comandos de Azure Powershell
-      shell: powershell
-      working-directory: ./app
-
-    - name: Obtener contexto AKS
-      run: |
-        echo "Obteniendo contexto de AKS..."
-      shell: powershell
-      working-directory: ./app
-
-    - name: Configurar Deployment
-      run: |
-        echo "Configurando Deployment de Kubernetes..."
+        # docker login -u ${{ inputs.username }} -p ${{ inputs.password }}
+        docker push http://localhost:5000/${{ inputs.app_name }}
       shell: powershell
       working-directory: ./app

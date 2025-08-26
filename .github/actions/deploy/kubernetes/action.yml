@@ -1,0 +1,34 @@
+name: Action para desplegar aplicaciones Node.js en IIS
+description: Esta acción se encarga de desplegar aplicaciones Node.js en un servidor IIS.
+inputs:
+  app_name:
+    description: 'Nombre de la aplicación'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Configurar credenciales AKS
+      run: |
+        echo "Configurando credenciales de AKS..."
+        # Acá van los comandos de Azure Powershell
+      shell: powershell
+
+    - name: Obtener contexto AKS
+      run: |
+        echo "Obteniendo contexto de AKS..."
+        echo "Obteniendo contexto con Minikube para simular"
+        minikube start
+      shell: powershell
+
+    - name: Configurar Deployment
+      run: |
+        echo "Buscando archivo de configuración de Deployment..."
+        if (Test-Path -Path './k8s/deployment.yaml') {
+          echo "Archivo de configuración de Deployment encontrado."
+        } else {
+          echo "Archivo de configuración de Deployment no encontrado."
+          exit 1
+        }
+        echo "Configurando Deployment de Kubernetes..."
+        kubectl apply -f ./k8s/deployment.yaml
+      shell: powershell

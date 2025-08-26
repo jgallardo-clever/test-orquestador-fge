@@ -15,11 +15,10 @@ on:
         type: choice
         options:
           - 'java-springboot-2.5.12'
-          - 'net-framework-4'
+          - 'net-framework'
           - 'php-laravel'
-          - 'nodejs-nestjs'
-          - 'nodejs-reactjs'
-          - 'nodejs-angularjs'
+          - 'nodejs'
+          - 'kubernetes'
       requiere_compilar:
         description: '¿Requiere compilar?'
         required: true
@@ -34,12 +33,10 @@ on:
 
 jobs:
   run-orquestador:
-    runs-on: self-hosted
-    steps:
-      - name: Llamar al workflow orquestador
-        uses: ./.github/workflows/orquestador.yml
-        with:
-          rama: ${{ github.event.inputs.rama }}
-          tecnologia: ${{ github.event.inputs.tecnologia }}
-          requiere_compilar: ${{ github.event.inputs.requiere_compilar }}
-          despliegue_en: ${{ github.event.inputs.despliegue_en }}
+    uses: jgallardo-clever/test-orquestador-fge/.github/workflows/orquestador.yml@main
+    with:
+      rama: ${{ inputs.rama }}
+      tecnologia: ${{ inputs.tecnologia }}
+      requiere_compilar: ${{ inputs.requiere_compilar }}
+      despliegue_en: ${{ inputs.despliegue_en }}
+    secrets: inherit
