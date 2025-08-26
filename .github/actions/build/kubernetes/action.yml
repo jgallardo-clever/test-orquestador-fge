@@ -14,6 +14,7 @@ runs:
         $app_name = (Get-Content -Path .\k8s\deployment.yaml | Select-String -Pattern "name:").Line.Split(':')[1].Trim()
         echo "app_name=$app_name" >> $GITHUB_ENV
       shell: powershell
+      working-directory: ./app
 
     - name: Buscar Dockerfile y buildear imagen Docker
       run: |
