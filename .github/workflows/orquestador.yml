@@ -21,10 +21,10 @@ on:
     secrets:
       server_ip:
         description: 'Dirección IP del servidor donde se desplegará la aplicación'
-        required: true
+        required: false
       remote_user:
         description: 'Usuario para conectarse al servidor remoto'
-        required: true
+        required: false
       tomcat_path:
         description: 'Ruta de instalación de Tomcat en el servidor remoto'
         required: false
