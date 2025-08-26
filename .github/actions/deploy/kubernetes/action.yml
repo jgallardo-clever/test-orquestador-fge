@@ -32,3 +32,4 @@ runs:
         echo "Configurando Deployment de Kubernetes..."
         kubectl apply -f ./k8s/deployment.yaml
       shell: powershell
+      working-directory: ./app
