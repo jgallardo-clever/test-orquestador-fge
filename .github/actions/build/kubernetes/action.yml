@@ -1,15 +1,5 @@
 name: Action para buildear aplicaciones en Kubernetes AKS
 description: Esta acción se encarga de buildear aplicaciones en un clúster de Kubernetes AKS.
-inputs:
-  temp:
-    description: Variable temporal mientras defino los inputs
-    required: true
-  username:
-    description: Nombre de usuario para el container registry
-    required: true
-  password:
-    description: Contraseña para el container registry
-    required: true
 outputs:
   app_name:
     description: Nombre de la imagen Docker
