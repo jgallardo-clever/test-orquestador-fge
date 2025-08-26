@@ -30,18 +30,18 @@ runs:
       shell: powershell
       working-directory: ./app
 
-    - name: Subir imagen a un container registry (http://localhost:5000)
+    - name: Subir imagen a un Docker Hub
       run: |
-        echo "Subiendo imagen Docker al container registry..."
+        echo "Subiendo imagen Docker a Docker Hub..."
         $app_name = "${{ steps.export.outputs.app_name }}"
-        $registry = "localhost:5000"
+        $registry = "xatomen"
         $fullImageName = "$registry/$app_name"
-        
-        echo "Subiendo imagen Docker al container registry..."
+
+        echo "Subiendo imagen Docker a Docker Hub..."
         echo "Registry: $registry"
         echo "Imagen: $fullImageName"
         
-        # Push de la imagen (sin http://)
+        # Push de la imagen al registry
         docker push $fullImageName
         
         if ($LASTEXITCODE -eq 0) {
