@@ -33,6 +33,22 @@ runs:
     - name: Subir imagen a un container registry (http://localhost:5000)
       run: |
         echo "Subiendo imagen Docker al container registry..."
-        docker push http://localhost:5000/${{ steps.export.outputs.app_name }}
+        $app_name = "${{ steps.export.outputs.app_name }}"
+        $registry = "localhost:5000"
+        $fullImageName = "$registry/$app_name"
+        
+        echo "Subiendo imagen Docker al container registry..."
+        echo "Registry: $registry"
+        echo "Imagen: $fullImageName"
+        
+        # Push de la imagen (sin http://)
+        docker push $fullImageName
+        
+        if ($LASTEXITCODE -eq 0) {
+            echo "Imagen subida exitosamente: $fullImageName"
+        } else {
+            echo "Error al subir la imagen al registry"
+            exit 1
+        }
       shell: powershell
       working-directory: ./app
