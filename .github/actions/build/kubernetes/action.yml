@@ -22,7 +22,7 @@ runs:
         echo "Buscando Dockerfile..."
         if (Test-Path -Path './Dockerfile') {
           echo "Dockerfile encontrado. Procediendo a construir la imagen Docker con el nombre ${{ steps.export.outputs.app_name }}..."
-          docker build -t ${{ steps.export.outputs.app_name }} . --no-cache
+          docker build -t xatomen/${{ steps.export.outputs.app_name }} . --no-cache
         } else {
           echo "Dockerfile no encontrado. Abortando."
           exit 1
