@@ -1,0 +1,37 @@
+name: Action para ejecutar pruebas de Node.js
+description: Acción para ejecutar pruebas de una aplicación Node.js
+inputs:
+  none:
+    description: none
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - name: Buscamos el directorio de la aplicación
+      id: find_project_directory
+      shell: powershell
+      working-directory: ./app
+      run: |
+        echo "Buscando el directorio del proyecto..."
+
+        # Buscamos el archivo package-lock.json para determinar el directorio del proyecto
+        $projectDir = Get-ChildItem -Recurse -Filter package-lock.json | Select-Object -First 1 | ForEach-Object { $_.DirectoryName }
+        if (-not $projectDir) {
+          Write-Error "No se encontró el archivo package-lock.json"
+          exit 1
+        }
+
+        # Exportamos la variable de entorno con el directorio de la aplicación
+        echo "project_directory=$projectDir" >> $env:GITHUB_OUTPUT
+        
+        echo "Directorio de la aplicación: $projectDir"
+
+    # Step para validar si existe el comando/script para ejecutar pruebas en el package.json
+
+    - name: Ejecutamos las pruebas
+      shell: powershell
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
+      run: |
+        echo "Ejecutando las pruebas..."
+        npm run test
+
