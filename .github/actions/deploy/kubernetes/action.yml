@@ -4,6 +4,12 @@ inputs:
   app_name:
     description: 'Nombre de la aplicación'
     required: true
+  resource_group:
+    description: 'Nombre del grupo de recursos de Azure'
+    required: true
+  aks_cluster_name:
+    description: 'Nombre del clúster AKS'
+    required: true
 runs:
   using: 'composite'
   steps:
@@ -16,8 +22,7 @@ runs:
     - name: Obtener contexto AKS
       run: |
         echo "Obteniendo contexto de AKS..."
-        echo "Obteniendo contexto con Minikube para simular"
-        minikube start
+        az aks get-credentials --resource-group ${{ inputs.resource_group }} --name ${{ inputs.aks_cluster_name }}
       shell: powershell
 
     - name: Configurar Deployment

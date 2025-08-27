@@ -31,9 +31,14 @@ on:
       project_path:
         description: 'Ruta del proyecto en el servidor remoto'
         required: false
-
       app_port:
         description: 'Puerto de la aplicación'
+        required: false
+      resource_group:
+        description: 'Nombre del grupo de recursos de Azure'
+        required: false
+      aks_cluster_name:
+        description: 'Nombre del clúster AKS'
         required: false
 
 jobs:
@@ -205,3 +210,5 @@ jobs:
         uses: ./orquestador/.github/actions/deploy/kubernetes
         with:
           app_name: ${{ needs.build.outputs.app_name }}
+          resource_group: ${{ secrets.resource_group }}
+          aks_cluster_name: ${{ secrets.aks_cluster_name }}
