@@ -30,7 +30,7 @@ runs:
       run: |
         $packageJson = Get-Content package.json | ConvertFrom-Json
         if (-not $packageJson.scripts.test) {
-          Write-Error "No se encontró el script de pruebas en package.json"
+          echo "No se encontró el script de pruebas en package.json"
           exit 0
         }
         echo "Script de pruebas encontrado: $($packageJson.scripts.test)"
