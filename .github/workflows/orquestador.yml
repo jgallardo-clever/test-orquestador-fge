@@ -143,6 +143,7 @@ jobs:
       - name: Checkout repository orquestador
         uses: actions/checkout@v4
         with:
+          repository: jgallardo-clever/test-orquestador-fge
           path: orquestador
 
       - name: Información del entorno a testear
