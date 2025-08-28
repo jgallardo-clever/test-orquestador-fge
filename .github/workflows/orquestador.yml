@@ -137,6 +137,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          path: app
       - name: Información del entorno a testear
         run: |
           echo "Rama: ${{ inputs.rama }}"

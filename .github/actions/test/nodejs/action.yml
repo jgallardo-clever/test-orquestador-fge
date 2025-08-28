@@ -3,6 +3,20 @@ description: Acción para ejecutar pruebas de una aplicación Node.js
 runs:
   using: "composite"
   steps:
+    - name: Instalar dependencias
+      shell: powershell
+      working-directory: ./app
+      run: |
+        echo "Instalando dependencias..."
+        npm install
+        if ($LASTEXITCODE -ne 0) {
+          Write-Error "Error al instalar dependencias"
+          exit 1
+        }
+        else {
+          Write-Host "Dependencias instaladas correctamente"
+        }
+
     - name: Buscamos el directorio de la aplicación
       id: find_project_directory
       shell: powershell
