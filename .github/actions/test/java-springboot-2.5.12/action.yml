@@ -38,21 +38,26 @@ runs:
               if ($pomContent -match "<scope>test</scope>") {
                 echo "La configuración de test se encuentra en pom.xml"
                 echo "has_test=true" >> $env:GITHUB_OUTPUT
+                exit 0
               } else {
                 echo "No se encontró la configuración de test en pom.xml"
                 echo "has_test=false" >> $env:GITHUB_OUTPUT
+                exit 1
               }
             } else {
               echo "No se encontró el archivo pom.xml"
               echo "has_test=false" >> $env:GITHUB_OUTPUT
+              exit 1
             }
           } else {
             echo "No se encontraron pruebas en el proyecto."
             echo "has_tests=false" >> $env:GITHUB_OUTPUT
+            exit 1
           }
         } else {
           echo "No se encontró el directorio de pruebas src/test/java."
           echo "has_tests=false" >> $env:GITHUB_OUTPUT
+          exit 1
         }
 
     - name: Ejecutar pruebas de Java Spring Boot 2.5.12
