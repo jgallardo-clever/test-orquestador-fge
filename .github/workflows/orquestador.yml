@@ -135,10 +135,16 @@ jobs:
     runs-on: self-hosted
     needs: build
     steps:
-      - name: Checkout repository
+      - name: Checkout repository app
         uses: actions/checkout@v4
         with:
           path: app
+
+      - name: Checkout repository orquestador
+        uses: actions/checkout@v4
+        with:
+          path: orquestador
+
       - name: Información del entorno a testear
         run: |
           echo "Rama: ${{ inputs.rama }}"
@@ -149,7 +155,7 @@ jobs:
 
       - name: Test Node.js
         if: ${{ inputs.tecnologia == 'nodejs' }}
-        uses: ./.github/actions/test/nodejs
+        uses: ./orquestador/.github/actions/test/nodejs
 
   deploy:
     runs-on: self-hosted
