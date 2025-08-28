@@ -39,7 +39,7 @@ runs:
     - name: Compilar aplicación Java Spring Boot 2.5.12
       run: |
         echo "Compilando aplicación Java Spring Boot 2.5.12..."
-        mvn clean package -DskipTests
+        mvn clean package -Dmaven.test.skip=true
         echo "Compilación completada."
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
