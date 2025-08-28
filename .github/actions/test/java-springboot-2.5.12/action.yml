@@ -35,7 +35,7 @@ runs:
             $pomPath = Join-Path -Path (Get-Location) -ChildPath "pom.xml"
             if (Test-Path $pomPath) {
               $pomContent = Get-Content $pomPath
-              if ($pomContent -match "<test>" -and $pomContent -match "<includes>") {
+              if ($pomContent -match "<scope>test</scope>") {
                 echo "La configuración de test se encuentra en pom.xml"
                 echo "has_test=true" >> $env:GITHUB_OUTPUT
               } else {
