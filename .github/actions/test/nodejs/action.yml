@@ -31,9 +31,11 @@ runs:
         $packageJson = Get-Content package.json | ConvertFrom-Json
         if (-not $packageJson.scripts.test) {
           echo "No se encontró el script de pruebas en package.json"
+          echo "has_tests=false" >> $env:GITHUB_OUTPUT
           exit 0
         }
         echo "Script de pruebas encontrado: $($packageJson.scripts.test)"
+        echo "has_tests=true" >> $env:GITHUB_OUTPUT
         if ($packageJson.scripts.tests -eq "jest") {
           echo "Usando Jest para pruebas"
           echo 'test_command="npm test"' >> $env:GITHUB_OUTPUT
@@ -47,6 +49,7 @@ runs:
 
     - name: Instalar dependencias
       shell: powershell
+      if: ${{ steps.test_script.outputs.has_tests == 'true' }}
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
       run: |
         echo "Instalando dependencias..."
@@ -61,6 +64,7 @@ runs:
 
     - name: Ejecutamos las pruebas
       shell: powershell
+      if: ${{ steps.test_script.outputs.has_tests == 'true' }}
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
       run: |
         echo "Ejecutando las pruebas..."
