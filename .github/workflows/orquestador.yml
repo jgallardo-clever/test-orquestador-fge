@@ -145,6 +145,10 @@ jobs:
       #   if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
       #   uses: ./.github/actions/test/java-springboot-2.5.12
 
+      - name: Test Node.js
+        if: ${{ inputs.tecnologia == 'nodejs' }}
+        uses: ./.github/actions/test/nodejs
+
   deploy:
     runs-on: self-hosted
     needs: [build, test]

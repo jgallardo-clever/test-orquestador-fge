@@ -1,9 +1,5 @@
 name: Action para ejecutar pruebas de Node.js
 description: Acción para ejecutar pruebas de una aplicación Node.js
-inputs:
-  none:
-    description: none
-    required: false
 runs:
   using: "composite"
   steps:
@@ -27,6 +23,15 @@ runs:
         echo "Directorio de la aplicación: $projectDir"
 
     # Step para validar si existe el comando/script para ejecutar pruebas en el package.json
+    - name: Validar existencia de script de pruebas
+      shell: powershell
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
+      run: |
+        $packageJson = Get-Content package.json | ConvertFrom-Json
+        if (-not $packageJson.scripts.test) {
+          Write-Error "No se encontró el script de pruebas en package.json"
+          exit 1
+        }
 
     - name: Ejecutamos las pruebas
       shell: powershell
@@ -34,4 +39,10 @@ runs:
       run: |
         echo "Ejecutando las pruebas..."
         npm run test
-
+        if ($LASTEXITCODE -ne 0) {
+          Write-Error "Las pruebas fallaron"
+          exit 1
+        }
+        else {
+          Write-Host "Las pruebas se ejecutaron correctamente"
+        }
