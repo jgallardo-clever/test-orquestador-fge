@@ -150,9 +150,9 @@ jobs:
         run: |
           echo "Rama: ${{ inputs.rama }}"
           echo "Tecnología: ${{ inputs.tecnologia }}"
-      # - name: Test Java Spring Boot 2.5.12
-      #   if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
-      #   uses: ./.github/actions/test/java-springboot-2.5.12
+      - name: Test Java Spring Boot 2.5.12
+        if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
+        uses: ./.github/actions/test/java-springboot-2.5.12
 
       - name: Test Node.js
         if: ${{ inputs.tecnologia == 'nodejs' }}

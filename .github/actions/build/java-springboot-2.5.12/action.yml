@@ -20,13 +20,29 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    - name: Buscar el archivo de proyecto pom.xml
+      id: find_project_directory
+      shell: powershell
+      working-directory: ./app
+      run: |
+        echo "Buscando el archivo pom.xml..."
+        $pomPath = Get-ChildItem -Recurse -Filter pom.xml | Select-Object -First 1 | ForEach-Object { $_.FullName }
+        if (-not $pomPath) {
+          echo "No se encontró el archivo pom.xml"
+          exit 1
+        }
+        echo "Archivo pom.xml encontrado en: $pomPath"
+        $projectDir = Split-Path $pomPath -Parent
+        echo "Ruta al directorio de proyecto: $projectDir"
+        echo "project_directory=$projectDir" >> $env:GITHUB_OUTPUT
+
     - name: Compilar aplicación Java Spring Boot 2.5.12
       run: |
         echo "Compilando aplicación Java Spring Boot 2.5.12..."
         mvn clean package -DskipTests
         echo "Compilación completada."
       shell: powershell
-      working-directory: ./app
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
       
     - name: Obtener nombre, versión y extensión del artefacto desde pom.xml
       id: get_artifact
@@ -49,8 +65,8 @@ runs:
         echo "version=$version" >> $env:GITHUB_OUTPUT
         echo "extension=$extension" >> $env:GITHUB_OUTPUT
       shell: powershell
-      working-directory: ./app
-      
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
+
     - name: Subir artefactos al servidor remoto
       run: |
         echo "Subiendo artefactos al servidor remoto..."
@@ -79,4 +95,4 @@ runs:
           exit 1
         }
       shell: powershell
-      working-directory: ./app
+      working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
