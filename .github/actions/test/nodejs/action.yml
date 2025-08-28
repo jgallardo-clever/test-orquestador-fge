@@ -24,6 +24,7 @@ runs:
 
     # Step para validar si existe el comando/script para ejecutar pruebas en el package.json
     - name: Validar existencia de script de pruebas
+      id: test_script
       shell: powershell
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
       run: |
@@ -31,6 +32,17 @@ runs:
         if (-not $packageJson.scripts.test) {
           Write-Error "No se encontró el script de pruebas en package.json"
           exit 1
+        }
+        echo "Script de pruebas encontrado: $($packageJson.scripts.test)"
+        if ($packageJson.scripts.tests -eq "jest") {
+          echo "Usando Jest para pruebas"
+          echo 'test_command="npm test"' >> $env:GITHUB_OUTPUT
+        } elseif ($packageJson.scripts.test -eq "ng test") {
+          echo "Usando Angular para pruebas"
+          echo 'test_command="ng test -- --watch=false --browsers=ChromeHeadless"' >> $env:GITHUB_OUTPUT
+        } else {
+          echo "Usando script por defecto"
+          echo 'test_command="npm test"' >> $env:GITHUB_OUTPUT
         }
 
     - name: Instalar dependencias
@@ -52,7 +64,8 @@ runs:
       working-directory: ${{ steps.find_project_directory.outputs.project_directory }}
       run: |
         echo "Ejecutando las pruebas..."
-        npm run test
+        $testCommand = ${{ steps.test_script.outputs.test_command }}
+        Invoke-Expression $testCommand
         if ($LASTEXITCODE -ne 0) {
           Write-Error "Las pruebas fallaron"
           exit 1
