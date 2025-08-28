@@ -28,7 +28,7 @@ runs:
         echo "Verificando si existen pruebas en el proyecto..."
         $testDir = Join-Path -Path (Get-Location) -ChildPath "src\test\java"
         if (Test-Path $testDir) {
-          $testFiles = Get-ChildItem -Path $testDir -Recurse -Filter "*Test.java"
+          $testFiles = Get-ChildItem -Path $testDir -Recurse -Filter "*Test*.java"
           if ($testFiles.Count -gt 0) {
             echo "Se encontraron pruebas en el proyecto."
             echo "Verificando si existe la configuración de test en pom.xml"
