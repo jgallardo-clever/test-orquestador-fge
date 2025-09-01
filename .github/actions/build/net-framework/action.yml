@@ -24,7 +24,7 @@ runs:
       id: find_project_directory
       run: |
         # Buscar archivos de proyecto .NET
-        $projectFiles = Get-ChildItem -Path . -Recurse -Include *.csproj, *.vbproj
+        $projectFiles = Get-ChildItem -Path . -Recurse -Include *.csproj, *.vbproj, *.fsproj | Where-Object { $_.FullName -notmatch 'Tests' }
         if ($projectFiles.Count -eq 0) {
           echo "No se encontraron archivos de proyecto .NET."
           exit 1
@@ -52,7 +52,7 @@ runs:
           echo "Error al recuperar dependencias."
           exit 1
         }
-        # Compilar la aplicación con msbuild
+        # Compilar la aplicación con dotnet
         try {
           msbuild
         } catch {

@@ -158,6 +158,10 @@ jobs:
         if: ${{ inputs.tecnologia == 'nodejs' }}
         uses: ./orquestador/.github/actions/test/nodejs
 
+      - name: Test .NET Framework
+        if: ${{ inputs.tecnologia == 'net-framework' }}
+        uses: ./orquestador/.github/actions/test/net-framework
+
   deploy:
     runs-on: self-hosted
     needs: [build, test]
