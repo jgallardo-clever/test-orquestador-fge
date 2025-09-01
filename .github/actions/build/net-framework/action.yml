@@ -43,15 +43,22 @@ runs:
       shell: powershell
       working-directory: ./app
 
+    - name: Restaurar dependencias con Nuget
+      shell: powershell
+      working-directory: ./app
+      run: |
+        echo "Buscamos el archivo .sln..."
+        $slnFile = Get-ChildItem -Path . -Recurse -Include *.sln | Select-Object -First 1
+        if ($slnFile) {
+          echo "Archivo .sln encontrado: $slnFile"
+        } else {
+          echo "No se encontró ningún archivo .sln."
+        }
+        echo "Restaurando dependencias con nuget..."
+        nuget restore $slnFile -PackagesDirectory ${{ steps.find_project_directory.outputs.project_directory }}\packages
+
     - name: Compilar aplicación .NET Framework
       run: |
-        # Restaurar dependencias con nuget
-        try {
-          nuget restore
-        } catch {
-          echo "Error al recuperar dependencias."
-          exit 1
-        }
         # Compilar la aplicación con dotnet
         try {
           msbuild
