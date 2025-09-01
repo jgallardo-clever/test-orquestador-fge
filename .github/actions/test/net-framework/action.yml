@@ -8,6 +8,11 @@ runs:
       shell: powershell
       working-directory: ./app
       run: |
+        echo "=== DEBUG: Información del directorio ==="
+        echo "Directorio actual: $(Get-Location)"
+        echo "Contenido del directorio ./app:"
+        Get-ChildItem -Name
+        echo ""
         # Buscar archivos de proyecto de tests .NET
         $testProjectFiles = Get-ChildItem -Path . -Recurse -Include *.csproj, *.vbproj, *.fsproj | Where-Object { $_.FullName -match 'Tests' }
         if ($testProjectFiles.Count -eq 0) {
