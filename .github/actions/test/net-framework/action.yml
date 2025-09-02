@@ -32,8 +32,6 @@ runs:
       shell: powershell
       working-directory: ${{ steps.find_test_project_directory.outputs.test_project_directory }}
       run: |
-        echo "Restaurar dependencias..."
-        nuget restore
         echo "Buildear proyecto de tests..."
         msbuild
         echo "Ejecutar pruebas..."
