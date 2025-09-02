@@ -33,6 +33,6 @@ runs:
       working-directory: ${{ steps.find_test_project_directory.outputs.test_project_directory }}
       run: |
         echo "Buildear proyecto de tests..."
-        msbuild
+        msbuild /p:Configuration=Release
         echo "Ejecutar pruebas..."
-        msbuild /p:Configuration=Release /p:Platform="Any CPU" /t:Test
+        vstest.console.exe .\bin\Release\*.Tests.dll
