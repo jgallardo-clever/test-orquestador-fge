@@ -3,6 +3,24 @@ description: 'Esta acción ejecuta pruebas de aplicaciones .NET Framework'
 runs:
   using: 'composite'
   steps:
+    - name: Restaurar dependencias con Nuget
+      shell: powershell
+      working-directory: ./app
+      run: |
+        echo "Buscamos el archivo .sln..."
+        $slnFile = Get-ChildItem -Path . -Recurse -Include *.sln | Select-Object -First 1
+        if ($slnFile) {
+          echo "Archivo .sln encontrado: $slnFile"
+        } else {
+          echo "No se encontró ningún archivo .sln."
+        }
+        echo "Restaurando dependencias con nuget en los directorios que contienen el archivo .csproj..."
+        $csprojFiles = Get-ChildItem -Path . -Recurse -Include *.csproj
+        foreach ($csprojFile in $csprojFiles) {
+          $csprojDirectory = Split-Path $csprojFile.FullName -Parent
+          nuget restore $csprojFile -PackagesDirectory "$csprojDirectory\packages"
+        }
+
     - name: Buscar los archivos de tests del proyecto .NET y retornar ruta del directorio
       id: find_test_project_directory
       shell: powershell
