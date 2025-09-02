@@ -21,6 +21,11 @@ runs:
           nuget restore $csprojFile -PackagesDirectory "$csprojDirectory\packages"
         }
 
+      ###################################################################################################
+      # En este caso estamos buscando los archivos de proyecto de tests .NET Framework, el cual es
+      # utilizado con MSTest, por lo que se espera que los archivos de prueba y proyecto tengan un
+      # sufijo .Tests
+      ###################################################################################################
     - name: Buscar los archivos de tests del proyecto .NET y retornar ruta del directorio
       id: find_test_project_directory
       shell: powershell
