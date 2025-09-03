@@ -10,8 +10,9 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: SonarQube Scan
-      uses: SonarSource/sonarqube-scan-action@v5.3.1 # Ex: v4.1.0, See the latest version at https://github.com/marketplace/actions/official-sonarqube-scan
-      env:
-        SONAR_TOKEN: ${{ inputs.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ inputs.SONAR_HOST_URL }}
+    - name: Escaneo SonarQube para proyectos no compilados
+      working-directory: ./app
+      shell: cmd
+      run: |
+        echo "Iniciando escaneo de SonarQube..."
+        sonar-scanner -Dsonar.projectKey=${{ github.event.repository.name }} -Dsonar.sources=. -Dsonar.host.url=${{ inputs.SONAR_HOST_URL }} -Dsonar.login=${{ inputs.SONAR_TOKEN }}
