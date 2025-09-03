@@ -1,0 +1,17 @@
+name: Code Analysis
+description: Run static code analysis
+inputs:
+  SONAR_TOKEN:
+    description: 'SonarQube token'
+    required: true
+  SONAR_HOST_URL:
+    description: 'SonarQube server URL'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@<action version> # Ex: v4.1.0, See the latest version at https://github.com/marketplace/actions/official-sonarqube-scan
+      env:
+        SONAR_TOKEN: ${{ inputs.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ inputs.SONAR_HOST_URL }}

@@ -18,6 +18,10 @@ on:
         description: 'Entorno de despliegue'
         required: true
         type: string
+      SONAR_HOST_URL:
+        description: 'URL del servidor de SonarQube'
+        required: false
+        type: string
     secrets:
       server_ip:
         description: 'Dirección IP del servidor donde se desplegará la aplicación'
@@ -39,6 +43,9 @@ on:
         required: false
       aks_cluster_name:
         description: 'Nombre del clúster AKS'
+        required: false
+      SONAR_TOKEN:
+        description: 'Token de autenticación de SonarQube'
         required: false
 
 jobs:
@@ -162,9 +169,30 @@ jobs:
         if: ${{ inputs.tecnologia == 'net-framework' }}
         uses: ./orquestador/.github/actions/test/net-framework
 
-  deploy:
+  code-analysis:
     runs-on: self-hosted
     needs: [build, test]
+    steps:
+      - name: Checkout repository app
+        uses: actions/checkout@v4
+        with:
+          path: app
+
+      - name: Checkout orquestador repository
+        uses: actions/checkout@v4
+        with:
+          repository: jgallardo-clever/test-orquestador-fge
+          path: orquestador
+
+      - name: Run SonarQube Analysis
+        uses: ./orquestador/.github/actions/code-analysis
+        with:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ inputs.SONAR_HOST_URL }}
+
+  deploy:
+    runs-on: self-hosted
+    needs: [build, test, code-analysis]
     steps:
       - name: Checkout orquestador repository
         uses: actions/checkout@v4
