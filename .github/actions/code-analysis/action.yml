@@ -28,12 +28,18 @@ runs:
     # Si el proyecto está en la raíz del repositorio, no hace falta
     # cambiar el directorio de trabajo.
     ###############################################################
-    - name: Escaneo SonarQube para proyectos Java Spring Boot
+    - name: Compilación Java Spring Boot
       if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
       working-directory: ./app
       shell: cmd
       run: |
         echo "Iniciando compilación del proyecto Java Spring Boot..."
         mvn clean compile
+    
+    - name: Escaneo SonarQube para proyectos Java Spring Boot
+      if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
+      working-directory: ./app
+      shell: cmd
+      run: |
         echo "Iniciando escaneo de SonarQube para proyecto Java Spring Boot..."
         sonar-scanner -Dsonar.projectKey=${{ github.event.repository.name }} -Dsonar.host.url=${{ inputs.SONAR_HOST_URL }} -Dsonar.login=${{ inputs.SONAR_TOKEN }} -Dsonar.java.binaries=target\classes
