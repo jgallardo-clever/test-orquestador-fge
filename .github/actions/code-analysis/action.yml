@@ -1,6 +1,9 @@
 name: Code Analysis
 description: Run static code analysis
 inputs:
+  tecnologia:
+    description: 'Tecnología a analizar'
+    required: true
   SONAR_TOKEN:
     description: 'SonarQube token'
     required: true
@@ -11,8 +14,26 @@ runs:
   using: "composite"
   steps:
     - name: Escaneo SonarQube para proyectos no compilados
+      if: ${{ inputs.tecnologia != 'java-springboot-2.5.12' }}
       working-directory: ./app
       shell: cmd
       run: |
         echo "Iniciando escaneo de SonarQube..."
         sonar-scanner -Dsonar.projectKey=${{ github.event.repository.name }} -Dsonar.sources=. -Dsonar.host.url=${{ inputs.SONAR_HOST_URL }} -Dsonar.login=${{ inputs.SONAR_TOKEN }}
+
+    ###############################################################
+    # Acá hay que validar si tenemos que buscar el pom.xml en el
+    # caso de que el proyecto esté dentro de un subdirectorio del
+    # repositorio.
+    # Si el proyecto está en la raíz del repositorio, no hace falta
+    # cambiar el directorio de trabajo.
+    ###############################################################
+    - name: Escaneo SonarQube para proyectos Java Spring Boot
+      if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
+      working-directory: ./app
+      shell: cmd
+      run: |
+        echo "Iniciando compilación del proyecto Java Spring Boot..."
+        mvn clean install
+        echo "Iniciando escaneo de SonarQube para proyecto Java Spring Boot..."
+        sonar-scanner -Dsonar.projectKey=${{ github.event.repository.name }} -Dsonar.host.url=${{ inputs.SONAR_HOST_URL }} -Dsonar.login=${{ inputs.SONAR_TOKEN }}

@@ -187,6 +187,7 @@ jobs:
       - name: Run SonarQube Analysis
         uses: ./orquestador/.github/actions/code-analysis
         with:
+          tecnologia: ${{ inputs.tecnologia }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ inputs.SONAR_HOST_URL }}
 
