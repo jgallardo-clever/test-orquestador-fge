@@ -34,6 +34,6 @@ runs:
       shell: cmd
       run: |
         echo "Iniciando compilación del proyecto Java Spring Boot..."
-        mvn clean package -Dmaven.test.skip=true
+        mvn clean compile
         echo "Iniciando escaneo de SonarQube para proyecto Java Spring Boot..."
-        sonar-scanner -Dsonar.projectKey=${{ github.event.repository.name }} -Dsonar.host.url=${{ inputs.SONAR_HOST_URL }} -Dsonar.login=${{ inputs.SONAR_TOKEN }}
+        sonar-scanner -Dsonar.projectKey=${{ github.event.repository.name }} -Dsonar.host.url=${{ inputs.SONAR_HOST_URL }} -Dsonar.login=${{ inputs.SONAR_TOKEN }} -Dsonar.java.binaries=target\classes
