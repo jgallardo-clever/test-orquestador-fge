@@ -19,10 +19,10 @@ on:
           - 'php-laravel'
           - 'nodejs'
           - 'kubernetes'
-      requiere_compilar:
-        description: '¿Requiere compilar?'
-        required: true
-        type: boolean
+      # requiere_compilar:
+      #   description: '¿Requiere compilar?'
+      #   required: true
+      #   type: boolean
       despliegue_en:
         description: 'Entorno de despliegue'
         required: true
@@ -37,6 +37,7 @@ jobs:
     with:
       rama: ${{ inputs.rama }}
       tecnologia: ${{ inputs.tecnologia }}
-      requiere_compilar: ${{ inputs.requiere_compilar }}
+      # requiere_compilar: ${{ inputs.requiere_compilar }}
       despliegue_en: ${{ inputs.despliegue_en }}
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
     secrets: inherit

@@ -10,10 +10,10 @@ on:
         description: 'Tecnología a desplegar'
         required: true
         type: string
-      requiere_compilar:
-        description: 'Indica si se requiere compilación'
-        required: true
-        type: boolean
+      # requiere_compilar:
+      #   description: 'Indica si se requiere compilación'
+      #   required: true
+      #   type: boolean
       despliegue_en:
         description: 'Entorno de despliegue'
         required: true
@@ -24,34 +24,38 @@ on:
         type: string
     secrets:
       server_ip:
-        description: 'Dirección IP del servidor donde se desplegará la aplicación'
+        description: 'Dirección IP del servidor donde se desplegará la aplicación - Ejemplo: 192.168.1.1'
         required: false
       remote_user:
-        description: 'Usuario para conectarse al servidor remoto'
+        description: 'Usuario para conectarse al servidor remoto - Ejemplo: administrador'
         required: false
       tomcat_path:
-        description: 'Ruta de instalación de Tomcat en el servidor remoto'
+        description: 'Ruta de instalación de Tomcat en el servidor remoto - Ejemplo: C:\Program Files\Apache Software Foundation\Tomcat 9.0'
         required: false
       project_path:
-        description: 'Ruta del proyecto en el servidor remoto'
+        description: 'Ruta del proyecto en el servidor remoto - Ejemplo: C:\inetpub\wwwroot\mi-proyecto'
         required: false
       app_port:
-        description: 'Puerto de la aplicación'
+        description: 'Puerto de la aplicación - Ejemplo: 3000'
         required: false
+      SONAR_TOKEN:
+        description: 'Token de autenticación de SonarQube'
+        required: false
+
+      ##################################################################
+      # Las dos siguientes deberían ser eliminadas si no se usa AKS
+      ##################################################################
       resource_group:
         description: 'Nombre del grupo de recursos de Azure'
         required: false
       aks_cluster_name:
         description: 'Nombre del clúster AKS'
         required: false
-      SONAR_TOKEN:
-        description: 'Token de autenticación de SonarQube'
-        required: false
-
+      
 jobs:
   build:
     runs-on: self-hosted
-    if: inputs.requiere_compilar
+    # if: inputs.requiere_compilar
     outputs:
       app_name: ${{ steps.build_step_java.outputs.app_name || steps.build_step_net_framework.outputs.app_name || steps.build_step_php_laravel.outputs.app_name || steps.build_step_node.outputs.app_name || steps.build_step_kubernetes.outputs.app_name }}
       version: ${{ steps.build_step_java.outputs.version || steps.build_step_net_framework.outputs.version }}
