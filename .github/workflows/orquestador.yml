@@ -247,7 +247,7 @@ jobs:
           # Nombre de la aplicación
           app_name: ${{ needs.build.outputs.app_name }}
           extension: ${{ needs.build.outputs.extension }}
-          tomcat_port: ${{ vars.PORT_APP || '8080' }}
+          tomcat_port: ${{ vars.TOMCAT_PORT || '8080' }}
 
       - name: Deploy .NET Framework
         if: ${{ inputs.tecnologia == 'net-framework' }}
