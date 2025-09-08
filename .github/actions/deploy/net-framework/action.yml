@@ -16,12 +16,19 @@ inputs:
   tipo_despliegue:
     description: 'Tipo de despliegue a realizar'
     required: true
-  site_name:
-    description: 'Nombre del sitio en IIS'
-    required: true
+  ########################################################################
+  # Configuración del sitio/webapp en IIS
+  ########################################################################
   project_path:
     description: 'Ruta del proyecto en el servidor remoto'
     required: true
+  site_name:
+    description: 'Nombre del sitio en IIS'
+    required: true
+  webapp_name:
+    description: 'Nombre de la web application en IIS (solo para tipo_deploy = webapp)'
+    required: false
+    default: ''
   ip_address:
     description: 'Dirección IP del sitio (dejar vacío para todas las IPs)'
     required: false

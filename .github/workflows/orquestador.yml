@@ -57,6 +57,7 @@ on:
     # - project_path: Ruta del proyecto en el servidor remoto
     # - tomcat_path: Ruta de instalación de Tomcat en el servidor remoto
     # - site_name: Nombre del sitio en IIS
+    # - webapp_name: Nombre de la web application en IIS (solo para tipo_deploy = webapp)
     # - app_name: Nombre de la aplicación -> Por ahora se saca desde el output de la job de build
     # - port_site: Puerto del sitio en IIS
     # - app_pool_name: Nombre del Application Pool en IIS
@@ -230,13 +231,23 @@ jobs:
         if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
         uses: ./orquestador/.github/actions/deploy/java-springboot-2.5.12
         with:
+          # Conexión al servidor
           server_ip: ${{ secrets.SERVER_IP }}
           remote_user: ${{ secrets.REMOTE_USER }}
-          tomcat_path: ${{ secrets.TOMCAT_PATH }}
+          # Tipo de despliegue
+          tipo_despliegue: ${{ inputs.tipo_despliegue }}
+          # Configuración IIS
+          site_name: ${{ vars.SITE_NAME }}
+          webapp_name: ${{ vars.WEBAPP_NAME || '' }}
+          tomcat_path: ${{ vars.TOMCAT_PATH }}
+          ip_address: ${{ vars.IP_ADDRESS || '*' }}
+          host_header: ${{ vars.HOST_HEADER || 'localhost' }}
+          port_site: ${{ vars.PORT_SITE }}
+          app_pool_name: ${{ needs.build.outputs.app_name }}-app-pool
+          # Nombre de la aplicación
           app_name: ${{ needs.build.outputs.app_name }}
-          version: ${{ needs.build.outputs.version }}
           extension: ${{ needs.build.outputs.extension }}
-          ip_address: 'localhost'
+          tomcat_port: ${{ vars.PORT_APP || '8080' }}
 
       - name: Deploy .NET Framework
         if: ${{ inputs.tecnologia == 'net-framework' }}
@@ -249,6 +260,7 @@ jobs:
           tipo_despliegue: ${{ inputs.tipo_despliegue }}
           # Configuración IIS
           site_name: ${{ vars.SITE_NAME }}
+          webapp_name: ${{ vars.WEBAPP_NAME || '' }}
           project_path: '${{ vars.PROJECT_PATH }}'
           ip_address: ${{ vars.IP_ADDRESS || '*' }}
           host_header: ${{ vars.HOST_HEADER || 'localhost' }}
