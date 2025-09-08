@@ -20,7 +20,7 @@ param (
 
 # Si no se especifica ipServer ni sshUser, se cancela la ejecución
 if (-not $ipServer -or -not $sshUser -or -not $siteName -or -not $targetUrl) {
-    Write-Error "ipServer, sshUser, siteName, and targetUrl must be specified."
+    echo "ipServer, sshUser, siteName, and targetUrl must be specified."
     return
 }
 
@@ -30,42 +30,38 @@ if (-not $ipServer -or -not $sshUser -or -not $siteName -or -not $targetUrl) {
 
 # Cargamos el script remoto que se ejecutará en el servidor IIS
 $remoteScript = @"
-# Importamos el módulo WebAdministration para gestionar IIS
+echo "Importamos el módulo WebAdministration para gestionar IIS"
 try {
     Import-Module WebAdministration
 }
 catch {
-    Write-Error "Error al importar el módulo WebAdministration. Asegúrese de que IIS esté instalado y el módulo esté disponible."
+    echo "Error al importar el módulo WebAdministration. Asegúrese de que IIS esté instalado y el módulo esté disponible."
     return
 }
 
-Write-Host "Configurando el proxy inverso para el sitio: '$siteName' hacia el objetivo: '$targetUrl'"
+echo "Configurando el proxy inverso para el sitio: '$siteName' hacia el objetivo: '$targetUrl'"
 
-# Activamos la funcionalidad de proxy en IIS (Esto sirve para garantizar que ARR esté habilitado)
+echo "Activamos la funcionalidad de proxy en IIS (Esto sirve para garantizar que ARR esté habilitado)"
 try {
     Set-WebConfigurationProperty -Filter "system.webServer/proxy" -Name "enabled" -Value `$true -PSPath "IIS:\"
-    Write-Host "Se habilitó la funcionalidad de proxy"
+    echo "Se habilitó la funcionalidad de proxy"
 } catch {
-    Write-Warning "No se pudo habilitar la funcionalidad de proxy. Asegúrese de que el módulo Application Request Routing (ARR) esté instalado."
+    echo "No se pudo habilitar la funcionalidad de proxy. Asegúrese de que el módulo Application Request Routing (ARR) esté instalado."
 }
 
-#################################
-# Configuración del proxy inverso
-#################################
-
-# Aseguramos que la sección de rewrite exista en el sitio especificado
+echo "Aseguramos que la sección de rewrite exista en el sitio especificado"
 `$sitePath = "IIS:\Sites\$siteName"
-Write-Host "Site Path: `$sitePath"
+echo "Site Path: `$sitePath"
 
-# Eliminar cualquier regla existente con el mismo nombre para evitar conflictos
+echo "Eliminar cualquier regla existente con el mismo nombre para evitar conflictos"
 try {
     Remove-WebConfigurationProperty -Filter "system.webServer/rewrite/rules" -PSPath `$sitePath -Name "." -AtElement @{name="ReverseProxyRule"} -ErrorAction SilentlyContinue
-    Write-Host "Se eliminó la regla existente con el nombre: ReverseProxyRule"
+    echo "Se eliminó la regla existente con el nombre: ReverseProxyRule"
 } catch {
-    Write-Host "No se encontró ninguna regla existente o se produjo un error al eliminarla."
+    echo "No se encontró ninguna regla existente o se produjo un error al eliminarla."
 }
 
-# Añadimos la nueva regla de rewrite
+echo "Añadimos la nueva regla de rewrite"
 try {
     Add-WebConfigurationProperty -Filter "system.webServer/rewrite/rules" -PSPath `$sitePath -Name "." -Value @{
         name = "ReverseProxyRule"
@@ -82,10 +78,10 @@ try {
             url = "$targetUrl/{R:1}"
         }
     }
-    Write-Host "Regla de proxy inverso creado satisfactoriamente: ReverseProxyRule"
-    Write-Host "Todas las solicitudes a $siteName serán redirigidas a $targetUrl"
+    echo "Regla de proxy inverso creado satisfactoriamente: ReverseProxyRule"
+    echo "Todas las solicitudes a $siteName serán redirigidas a $targetUrl"
 } catch {
-    Write-Error "Error al crear la regla de proxy inverso: `$_"
+    echo "Error al crear la regla de proxy inverso: `$_"
     return
 }
 "@

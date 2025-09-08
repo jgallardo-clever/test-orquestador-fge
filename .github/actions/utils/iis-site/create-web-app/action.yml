@@ -10,13 +10,13 @@ inputs:
   physical_path:
     description: "Ruta física de la aplicación (ejemplo: C:\\inetpub\\wwwroot\\mysite\\myapp)"
     required: true
-  application_pool:
+  app_pool_name:
     description: "Nombre del Application Pool que usará la aplicación"
     required: true
-  ip_server:
+  servidor_remoto:
     description: "Dirección IP del servidor remoto donde se creará la aplicación"
     required: true
-  ssh_user:
+  usuario:
     description: "Usuario para conectarse al servidor remoto"
     required: true
 runs:
@@ -33,6 +33,6 @@ runs:
     - name: Crear Aplicación Web en IIS
       run: |
         echo "Ejecutando el script para crear la aplicación web en IIS..."
-        .\create-web-app.ps1 -siteName '${{ inputs.site_name }}' -appName '${{ inputs.app_name }}' -physicalPath '${{ inputs.physical_path }}' -applicationPool '${{ inputs.application_pool }}' -ipServer '${{ inputs.ip_server }}' -sshUser '${{ inputs.ssh_user }}'
+        .\create-web-app.ps1 -siteName '${{ inputs.site_name }}' -appName '${{ inputs.app_name }}' -physicalPath '${{ inputs.physical_path }}' -applicationPool '${{ inputs.app_pool_name }}' -ipServer '${{ inputs.servidor_remoto }}' -sshUser '${{ inputs.usuario }}'
       shell: powershell
       working-directory: ./orquestador/.github/actions/utils/iis-site/create-web-app
