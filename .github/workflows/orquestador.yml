@@ -225,7 +225,7 @@ jobs:
         run: |
           echo "Rama: ${{ inputs.rama }}"
           echo "Tecnología: ${{ inputs.tecnologia }}"
-          echo "Despliegue en: ${{ inputs.despliegue_en }}"
+          echo "Tipo de despliegue: ${{ inputs.tipo_despliegue }}"
       - name: Deploy Java Spring Boot 2.5.12
         if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
         uses: ./orquestador/.github/actions/deploy/java-springboot-2.5.12
@@ -267,7 +267,7 @@ jobs:
           app_name: test-app
 
       - name: Deploy Node.js IIS
-        if: ${{ inputs.tecnologia == 'nodejs' && inputs.despliegue_en == 'IIS' }}
+        if: ${{ inputs.tecnologia == 'nodejs'}}
         uses: ./orquestador/.github/actions/deploy/nodejs-iis
         with:
           server_ip: ${{ secrets.SERVER_IP }}

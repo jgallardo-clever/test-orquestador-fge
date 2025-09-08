@@ -5,8 +5,8 @@
 param(
     [string]$siteName,
     [string]$appName,
-    [string]$sitePath,
-    [string]$appPoolName,
+    [string]$physicalPath,
+    [string]$applicationPool,
 
     # Parámetros de conexión al servidor IIS
     [string]$ipServer,                  # Dirección IP del servidor IIS
@@ -19,7 +19,7 @@ param(
 
 # Si no se especifica ipServer ni sshUser, se cancela la ejecución
 if (-not $ipServer -or -not $sshUser -or -not $siteName -or -not $appName -or -not $physicalPath -or -not $applicationPool) {
-    Write-Error "ipServer, sshUser, siteName, appName, physicalPath, y applicationPool deben ser especificados."
+    echo "ipServer, sshUser, siteName, appName, physicalPath, y applicationPool deben ser especificados."
     return
 }
 

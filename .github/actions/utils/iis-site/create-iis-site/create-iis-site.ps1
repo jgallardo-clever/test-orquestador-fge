@@ -24,7 +24,7 @@ param (
 
 # Si no se especifica ipServer ni sshUser, se cancela la ejecución
 if (-not $ipServer -or -not $sshUser -or -not $siteName -or -not $appPoolName -or -not $sitePath) {
-    Write-Error "ipServer, sshUser, siteName, appPoolName, y sitePath deben ser especificados."
+    echo "ipServer, sshUser, siteName, appPoolName, y sitePath deben ser especificados."
     return
 }
 
