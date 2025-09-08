@@ -244,7 +244,7 @@ jobs:
           host_header: ${{ vars.HOST_HEADER || 'localhost' }}
           port_site: ${{ vars.PORT_SITE }}
           app_pool_name: ${{ needs.build.outputs.app_name }}-app-pool
-          # Nombre de la aplicación
+          # Configuración de la aplicación
           app_name: ${{ needs.build.outputs.app_name }}
           extension: ${{ needs.build.outputs.extension }}
           tomcat_port: ${{ vars.TOMCAT_PORT || '8080' }}
@@ -266,7 +266,7 @@ jobs:
           host_header: ${{ vars.HOST_HEADER || 'localhost' }}
           port_site: ${{ vars.PORT_SITE || '80' }}
           app_pool_name: ${{ needs.build.outputs.app_name }}-app-pool
-          # Nombre de la aplicación
+          # Configuración de la aplicación
           app_name: ${{ needs.build.outputs.app_name }}
 
       - name: Deploy PHP Laravel
@@ -282,9 +282,20 @@ jobs:
         if: ${{ inputs.tecnologia == 'nodejs'}}
         uses: ./orquestador/.github/actions/deploy/nodejs-iis
         with:
+          # Conexión al servidor
           server_ip: ${{ secrets.SERVER_IP }}
           remote_user: ${{ secrets.REMOTE_USER }}
+          # Tipo de despliegue
+          tipo_despliegue: ${{ inputs.tipo_despliegue }}
+          # Configuración IIS
+          site_name: ${{ vars.SITE_NAME }}
+          webapp_name: ${{ vars.WEBAPP_NAME || '' }}
           project_path: '${{ secrets.PROJECT_PATH }}'
+          ip_address: ${{ vars.IP_ADDRESS || '*' }}
+          host_header: ${{ vars.HOST_HEADER || 'localhost' }}
+          port_site: ${{ vars.PORT_SITE || '80' }}
+          app_pool_name: ${{ needs.build.outputs.app_name }}-app-pool
+          # Configuración de la aplicación
           app_name: ${{ needs.build.outputs.app_name }}
           start_command: ${{ needs.build.outputs.start_command }}
           app_port: ${{ secrets.APP_PORT }}

@@ -1,17 +1,54 @@
 name: Action para desplegar aplicaciones Node.js en IIS
 description: Esta acción se encarga de desplegar aplicaciones Node.js en un servidor IIS.
 inputs:
+  ########################################################################
+  # Conexión al servidor
+  ########################################################################
   server_ip:
     description: 'Dirección IP del servidor donde se desplegará la aplicación'
     required: true
   remote_user:
     description: 'Usuario para conectarse al servidor remoto'
     required: true
-  app_name:
-    description: 'Nombre de la aplicación'
+  ########################################################################
+  # Tipo de despliegue
+  ########################################################################
+  tipo_despliegue:
+    description: 'Tipo de despliegue a realizar'
     required: true
+  ########################################################################
+  # Configuración del sitio/webapp en IIS
+  ########################################################################
   project_path:
     description: 'Ruta de la aplicación en el servidor'
+    required: true
+  site_name:
+    description: 'Nombre del sitio en IIS'
+    required: true
+  webapp_name:
+    description: 'Nombre de la web application en IIS (solo para tipo_deploy = webapp)'
+    required: false
+    default: ''
+  ip_address:
+    description: 'Dirección IP del sitio (dejar vacío para todas las IPs)'
+    required: false
+    default: '*'
+  host_header:
+    description: 'Header del host para el sitio'
+    required: false
+    default: 'localhost'
+  port_site:
+    description: 'Puerto del sitio'
+    required: false
+    default: '80'
+  app_pool_name:
+    description: 'Nombre del Application Pool'
+    required: true
+  ########################################################################
+  # Configuración de la aplicación
+  ########################################################################
+  app_name:
+    description: 'Nombre de la aplicación a desplegar'
     required: true
   start_command:
     description: 'Comando para iniciar la aplicación con PM2'
@@ -29,6 +66,7 @@ runs:
         echo "Eliminar proceso pm2..."
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} pm2 stop ${{ inputs.app_name }}
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} pm2 delete ${{ inputs.app_name }}
+        # Revisar el paso de eliminar el directorio de la aplicación
         echo "Eliminando directorio de la aplicación..."
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} rmdir /s /q \"${{ inputs.project_path }}\${{ inputs.app_name }}\"
         echo "Desplegando aplicación en IIS..."
@@ -51,16 +89,33 @@ runs:
       shell: powershell
 
     - name: Crear Sitio en IIS
+      if: ${{ inputs.tipo_despliegue == 'site' }}
       uses: ./orquestador/.github/actions/utils/iis-site/create-iis-site
       with:
-        site_name: '${{ inputs.app_name }}'
-        app_pool_name: '${{ inputs.app_name }}-app-pool'
-        physical_path: '${{ inputs.project_path }}\${{ inputs.app_name }}'
-        host_header: 'localhost'
-        port: '80'
-        # ip_address: '${{ inputs.ip_address }}'
+        # Conexión al servidor
         servidor_remoto: '${{ inputs.server_ip }}'
         usuario: '${{ inputs.remote_user }}'
+        # Configuración del sitio
+        site_name: '${{ inputs.site_name }}'
+        app_pool_name: '${{ inputs.app_name }}-app-pool'
+        physical_path: '${{ inputs.project_path }}\${{ inputs.app_name }}'
+        host_header: ${{ inputs.host_header }}
+        port: ${{ inputs.port_site }}
+        ip_address: '${{ inputs.ip_address }}'
+
+    - name: Crear Web Application en IIS
+      if: ${{ inputs.tipo_despliegue == 'webapp' }}
+      uses: ./orquestador/.github/actions/utils/iis-webapp/create-iis-web-app
+      with:
+        # Conexión al servidor
+        servidor_remoto: '${{ inputs.server_ip }}'
+        usuario: '${{ inputs.remote_user }}'
+        # Configuración del sitio
+        site_name: '${{ inputs.site_name }}'
+        app_name: '${{ inputs.webapp_name }}'
+        app_pool_name: '${{ inputs.app_name }}-app-pool'
+        physical_path: '${{ inputs.project_path }}\${{ inputs.app_name }}'
+        
 
     - name: Iniciar aplicación con PM2
       run: |
@@ -78,10 +133,20 @@ runs:
         }
       shell: powershell
 
-    - name: Configurar proxy inverso en IIS
+    - name: Configurar proxy inverso en IIS para Sitio
+      if: ${{ inputs.tipo_despliegue == 'site' }}
       uses: ./orquestador/.github/actions/utils/iis-site/setup-reverse-proxy
       with:
-        site_name: '${{ inputs.app_name }}'
+        site_name: '${{ inputs.site_name }}'
+        target_url: 'http://localhost:${{ inputs.app_port }}'
+        servidor_remoto: '${{ inputs.server_ip }}'
+        usuario: '${{ inputs.remote_user }}'
+
+    - name: Configurar proxy inverso en IIS para Web Application
+      if: ${{ inputs.tipo_despliegue == 'webapp' }}
+      uses: ./orquestador/.github/actions/utils/iis-webapp/setup-reverse-proxy
+      with:
+        site_name: '${{ inputs.site_name }}/${{ inputs.webapp_name }}'
         target_url: 'http://localhost:${{ inputs.app_port }}'
         servidor_remoto: '${{ inputs.server_ip }}'
         usuario: '${{ inputs.remote_user }}'

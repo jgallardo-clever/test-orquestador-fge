@@ -45,7 +45,7 @@ inputs:
     description: 'Nombre del Application Pool'
     required: true
   ########################################################################
-  # Nombre de la aplicación
+  # Configuración de la aplicación
   ########################################################################
   app_name:
     description: 'Nombre de la aplicación a desplegar'
@@ -92,14 +92,14 @@ runs:
         
     - name: Crear Web Application en IIS
       if: ${{ inputs.tipo_despliegue == 'webapp' }}
-      uses: ./orquestador/.github/actions/utils/iis-webapp/create-iis-web-app
+      uses: ./orquestador/.github/actions/utils/iis-site/create-web-app
       with:
         # Conexión al servidor
         servidor_remoto: '${{ inputs.server_ip }}'
         usuario: '${{ inputs.remote_user }}'
         # Configuración del sitio
         site_name: '${{ inputs.site_name }}'
-        app_name: '${{ inputs.app_name }}'
+        app_name: '${{ inputs.webapp_name }}'
         app_pool_name: '${{ inputs.app_name }}-app-pool'
         physical_path: '${{ inputs.tomcat_path }}\${{ inputs.app_name }}'
 
