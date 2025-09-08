@@ -14,10 +14,6 @@ on:
         description: 'Tipo de despliegue'
         required: true
         type: string
-      despliegue_en:
-        description: 'Entorno de despliegue'
-        required: true
-        type: string
       SONAR_HOST_URL:
         description: 'URL del servidor de SonarQube'
         required: false
