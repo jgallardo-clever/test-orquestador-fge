@@ -1,21 +1,48 @@
 name: Action para desplegar aplicaciones Java Spring Boot 2.5.12
 description: 'Esta acción despliega aplicaciones Java Spring Boot 2.5.12'
 inputs:
+  ########################################################################
+  # Conexión al servidor
+  ########################################################################
   server_ip:
     description: 'Dirección IP del servidor donde se desplegará la aplicación'
     required: true
   remote_user:
     description: 'Usuario para conectarse al servidor remoto'
     required: true
+  ########################################################################
+  # Tipo de despliegue
+  ########################################################################
+  tipo_despliegue:
+    description: 'Tipo de despliegue a realizar'
+    required: true
+  site_name:
+    description: 'Nombre del sitio en IIS'
+    required: true
   project_path:
     description: 'Ruta del proyecto en el servidor remoto'
-    required: true
-  app_name:
-    description: 'Nombre de la aplicación a desplegar'
     required: true
   ip_address:
     description: 'Dirección IP del sitio (dejar vacío para todas las IPs)'
     required: false
+    default: '*'
+  host_header:
+    description: 'Header del host para el sitio'
+    required: false
+    default: 'localhost'
+  port_site:
+    description: 'Puerto del sitio'
+    required: false
+    default: '80'
+  app_pool_name:
+    description: 'Nombre del Application Pool'
+    required: true
+  ########################################################################
+  # Nombre de la aplicación
+  ########################################################################
+  app_name:
+    description: 'Nombre de la aplicación a desplegar'
+    required: true
 runs:
   using: 'composite'
   steps:
@@ -44,13 +71,30 @@ runs:
         usuario: '${{ inputs.remote_user }}'
         
     - name: Crear Sitio en IIS
+      if: ${{ inputs.tipo_despliegue == 'site' }}
       uses: ./orquestador/.github/actions/utils/iis-site/create-iis-site
       with:
-        site_name: '${{ inputs.app_name }}'
-        app_pool_name: '${{ inputs.app_name }}-app-pool'
-        physical_path: '${{ inputs.project_path }}\${{ inputs.app_name }}'
-        host_header: 'localhost'
-        port: '80'
-        # ip_address: '${{ inputs.ip_address }}'
+        # Conexión al servidor
         servidor_remoto: '${{ inputs.server_ip }}'
         usuario: '${{ inputs.remote_user }}'
+        # Configuración del sitio
+        site_name: '${{ inputs.site_name }}'
+        app_pool_name: '${{ inputs.app_name }}-app-pool'
+        physical_path: '${{ inputs.project_path }}\${{ inputs.app_name }}'
+        host_header: ${{ inputs.host_header }}
+        port: ${{ inputs.port_site }}
+        ip_address: '${{ inputs.ip_address }}'
+        
+    - name: Crear Web Application en IIS
+      if: ${{ inputs.tipo_despliegue == 'webapp' }}
+      uses: ./orquestador/.github/actions/utils/iis-webapp/create-iis-webapp
+      with:
+        # Conexión al servidor
+        servidor_remoto: '${{ inputs.server_ip }}'
+        usuario: '${{ inputs.remote_user }}'
+        # Configuración del sitio
+        site_name: '${{ inputs.site_name }}'
+        app_name: '${{ inputs.app_name }}'
+        app_pool_name: '${{ inputs.app_name }}-app-pool'
+        physical_path: '${{ inputs.project_path }}\${{ inputs.app_name }}'
+        

@@ -19,17 +19,13 @@ on:
           - 'php-laravel'
           - 'nodejs'
           - 'kubernetes'
-      # requiere_compilar:
-      #   description: '¿Requiere compilar?'
-      #   required: true
-      #   type: boolean
-      despliegue_en:
-        description: 'Entorno de despliegue'
+      tipo_despliegue:
+        description: 'Tipo de despliegue'
         required: true
         type: choice
         options:
-          - 'IIS'
-          - 'AKS'
+          - 'site'
+          - 'webapp'
 
 jobs:
   run-orquestador:
@@ -37,7 +33,7 @@ jobs:
     with:
       rama: ${{ inputs.rama }}
       tecnologia: ${{ inputs.tecnologia }}
-      # requiere_compilar: ${{ inputs.requiere_compilar }}
-      despliegue_en: ${{ inputs.despliegue_en }}
-      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      tipo_despliegue: ${{ inputs.tipo_despliegue }}
+      # despliegue_en: ${{ inputs.despliegue_en }}
+      SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
     secrets: inherit

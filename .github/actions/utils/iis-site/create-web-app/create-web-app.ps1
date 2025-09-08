@@ -5,8 +5,8 @@
 param(
     [string]$siteName,
     [string]$appName,
-    [string]$physicalPath,
-    [string]$applicationPool,
+    [string]$sitePath,
+    [string]$appPoolName,
 
     # Parámetros de conexión al servidor IIS
     [string]$ipServer,                  # Dirección IP del servidor IIS
@@ -29,29 +29,34 @@ if (-not $ipServer -or -not $sshUser -or -not $siteName -or -not $appName -or -n
 
 # Cargamos el script remoto que se ejecutará en el servidor IIS
 $remoteScript = @"
-# Dar acceso a IIS_IUSRS al directorio de la aplicación
+echo "Dar acceso a IIS_IUSRS al directorio de la aplicación..."
 try {
     icacls '$physicalPath' /grant 'IIS_IUSRS:(OI)(CI)M'
 } catch {
-    Write-Error "Error al establecer permisos en $physicalPath. Asegúrese de que la ruta exista y sea accesible."
+    echo "Error al establecer permisos en $physicalPath. Asegúrese de que la ruta exista y sea accesible."
     return
 }
 
 Import-Module WebAdministration
 
-# Verificar si el sitio existe
+echo "Verificar si el sitio existe..."
 if (-not (Get-Website -Name $siteName -ErrorAction SilentlyContinue)) {
-    Write-Host "El sitio '$siteName' no existe."
+    echo "El sitio '$siteName' no existe."
+    exit
+}
+echo "Verificar si la aplicación ya existe..."
+if (Get-WebApplication -Site $siteName | findstr '$appName') {
+    echo "La aplicación '$appName' ya existe en el sitio '$siteName'."
     exit
 }
 
-# Crear la aplicación
+echo "Crear la aplicación..."
 try {
   New-WebApplication -Site $siteName -Name $appName -PhysicalPath '$physicalPath' -ApplicationPool $applicationPool
-  Write-Host "Aplicación '$appName' creada en el sitio '$siteName' con éxito."
+  echo "Aplicación '$appName' creada en el sitio '$siteName' con éxito."
 }
 catch {
-  Write-Warning "Error al crear la aplicación '$appName' en el sitio '$siteName'."
+  echo "Error al crear la aplicación '$appName' en el sitio '$siteName'."
 }
 "@
 

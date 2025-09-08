@@ -33,6 +33,6 @@ runs:
     - name: Crear Aplicación Web en IIS
       run: |
         echo "Ejecutando el script para crear la aplicación web en IIS..."
-        .\create-web-app.ps1 -siteName '${{ inputs.site_name }}' -appName '${{ inputs.app_name }}' -physicalPath '${{ inputs.physical_path }}' -applicationPool '${{ inputs.application_pool }}' -ipServer '${{ inputs.ip_server }}' -sshUser '${{ inputs.ssh_user }}'
+        .\create-web-app.ps1 -siteName '${{ inputs.site_name }}' -appName '${{ inputs.app_name }}' -appPath '${{ inputs.physical_path }}' -appPoolName '${{ inputs.application_pool }}' -ipServer '${{ inputs.ip_server }}' -sshUser '${{ inputs.ssh_user }}'
       shell: powershell
       working-directory: ./orquestador/.github/actions/utils/iis-site/create-web-app

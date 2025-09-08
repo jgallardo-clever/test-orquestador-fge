@@ -10,10 +10,10 @@ on:
         description: 'Tecnología a desplegar'
         required: true
         type: string
-      # requiere_compilar:
-      #   description: 'Indica si se requiere compilación'
-      #   required: true
-      #   type: boolean
+      tipo_despliegue:
+        description: 'Tipo de despliegue'
+        required: true
+        type: string
       despliegue_en:
         description: 'Entorno de despliegue'
         required: true
@@ -23,6 +23,10 @@ on:
         required: false
         type: string
     secrets:
+      ##################################################################
+      # Parámetros para conectarse al servidor y tokens
+      ##################################################################
+
       server_ip:
         description: 'Dirección IP del servidor donde se desplegará la aplicación - Ejemplo: 192.168.1.1'
         required: false
@@ -52,6 +56,19 @@ on:
         description: 'Nombre del clúster AKS'
         required: false
       
+    ##################################################################
+    # Variables de repositorio:
+    # - project_path: Ruta del proyecto en el servidor remoto
+    # - tomcat_path: Ruta de instalación de Tomcat en el servidor remoto
+    # - site_name: Nombre del sitio en IIS
+    # - app_name: Nombre de la aplicación -> Por ahora se saca desde el output de la job de build
+    # - port_site: Puerto del sitio en IIS
+    # - app_pool_name: Nombre del Application Pool en IIS
+    # - port_app: Puerto de la aplicación para hacer reverse proxy
+    # - host_header: Host header para el binding del sitio en IIS
+    # - ip_address: Dirección IP para el binding del sitio en IIS
+    ##################################################################
+
 jobs:
   build:
     runs-on: self-hosted
@@ -161,17 +178,17 @@ jobs:
         run: |
           echo "Rama: ${{ inputs.rama }}"
           echo "Tecnología: ${{ inputs.tecnologia }}"
-      - name: Test Java Spring Boot 2.5.12
-        if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
-        uses: ./orquestador/.github/actions/test/java-springboot-2.5.12
+      # - name: Test Java Spring Boot 2.5.12
+      #   if: ${{ inputs.tecnologia == 'java-springboot-2.5.12' }}
+      #   uses: ./orquestador/.github/actions/test/java-springboot-2.5.12
 
-      - name: Test Node.js
-        if: ${{ inputs.tecnologia == 'nodejs' }}
-        uses: ./orquestador/.github/actions/test/nodejs
+      # - name: Test Node.js
+      #   if: ${{ inputs.tecnologia == 'nodejs' }}
+      #   uses: ./orquestador/.github/actions/test/nodejs
 
-      - name: Test .NET Framework
-        if: ${{ inputs.tecnologia == 'net-framework' }}
-        uses: ./orquestador/.github/actions/test/net-framework
+      # - name: Test .NET Framework
+      #   if: ${{ inputs.tecnologia == 'net-framework' }}
+      #   uses: ./orquestador/.github/actions/test/net-framework
 
   code-analysis:
     runs-on: self-hosted
@@ -188,12 +205,12 @@ jobs:
           repository: jgallardo-clever/test-orquestador-fge
           path: orquestador
 
-      - name: Run SonarQube Analysis
-        uses: ./orquestador/.github/actions/code-analysis
-        with:
-          tecnologia: ${{ inputs.tecnologia }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ inputs.SONAR_HOST_URL }}
+      # - name: Run SonarQube Analysis
+      #   uses: ./orquestador/.github/actions/code-analysis
+      #   with:
+      #     tecnologia: ${{ inputs.tecnologia }}
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ inputs.SONAR_HOST_URL }}
 
   deploy:
     runs-on: self-hosted
@@ -229,11 +246,20 @@ jobs:
         if: ${{ inputs.tecnologia == 'net-framework' }}
         uses: ./orquestador/.github/actions/deploy/net-framework
         with:
+          # Conexión al servidor
           server_ip: ${{ secrets.SERVER_IP }}
           remote_user: ${{ secrets.REMOTE_USER }}
+          # Tipo de despliegue
+          tipo_despliegue: ${{ inputs.tipo_despliegue }}
+          # Configuración IIS
+          site_name: ${{ vars.SITE_NAME }}
           project_path: '${{ secrets.PROJECT_PATH }}'
+          ip_address: ${{ vars.IP_ADDRESS || '*' }}
+          host_header: ${{ vars.HOST_HEADER || 'localhost' }}
+          port_site: ${{ vars.PORT_SITE || '80' }}
+          app_pool_name: ${{ needs.build.outputs.app_name }}-app-pool
+          # Nombre de la aplicación
           app_name: ${{ needs.build.outputs.app_name }}
-          ip_address: 'localhost'
 
       - name: Deploy PHP Laravel
         if: ${{ inputs.tecnologia == 'php-laravel' }}

@@ -34,59 +34,62 @@ if (-not $ipServer -or -not $sshUser -or -not $siteName -or -not $appPoolName -o
 
 # Cargamos el script remoto que se ejecutará en el servidor IIS
 $remoteScript = @"
-# Dar acceso a IIS_IUSRS al directorio del sitio
+echo "Dar acceso a IIS_IUSRS al directorio del sitio..."
 try {
     icacls '$sitePath' /grant 'IIS_IUSRS:(OI)(CI)M'
 } catch {
-    Write-Error "Error al establecer permisos en $sitePath. Asegúrese de que la ruta exista y sea accesible."
+    echo "Error al establecer permisos en $sitePath. Asegúrese de que la ruta exista y sea accesible."
     return
 }
-# Importamos el módulo WebAdministration para gestionar IIS
+
+echo "Importamos el módulo WebAdministration para gestionar IIS..."
 try {
     Import-Module WebAdministration
-}
-catch {
-    Write-Error "Error al importar el módulo WebAdministration. Asegúrese de que IIS esté instalado y el módulo esté disponible."
-    return
-}
-
-Write-Host "Configurando el sitio IIS: $siteName"
-
-# Verificamos si el Application Pool ya existe
-Write-Host "Verificando si el Application Pool $appPoolName existe..."
-try{
-    # Si el Application Pool ya existe, no devolverá error, por lo que podemos continuar con la ejecución
-    Get-WebAppPoolState -Name $appPoolName -ErrorAction SilentlyContinue | Out-Null
-    Write-Host "El Application Pool $appPoolName ya existe."
 } catch {
-    # Si no existe, informamos al usuario y finalizamos el script
-    Write-Host "El Application Pool $appPoolName no existe."
+    echo "Error al importar el módulo WebAdministration. Asegúrese de que IIS esté instalado y el módulo esté disponible."
     return
 }
 
-# Verificamos si el sitio IIS ya existe
-Write-Host "Verificando si el sitio IIS $siteName existe..."
+echo "Verificando si el Application Pool $appPoolName existe..."
+try{
+    Get-WebAppPoolState -Name $appPoolName -ErrorAction SilentlyContinue | Out-Null
+    echo "El Application Pool $appPoolName ya existe."
+} catch {
+    echo "El Application Pool $appPoolName no existe."
+    return
+}
+
+echo "Verificando si el sitio IIS $siteName existe..."
 try {
+    echo "Validando si el sitio $siteName ya existe..."
     `$exists = Get-Website -Name $siteName -ErrorAction SilentlyContinue
-    Write-Host "Resultado validacion: `$exists"
-    # Si sitio web ya existe, lo eliminamos (para crear uno nuevo posteriormente)
+    echo "Resultado validacion: `$exists"
     if(`$exists -ne `$null) {
-        Write-Host "El sitio $siteName ya existe. Eliminándolo..."
-        Remove-Website -Name $siteName -ErrorAction SilentlyContinue
-        Write-Host "Se eliminó el sitio existente: $siteName"
+        echo "El sitio $siteName ya existe, aplicando configuración nueva."
+        try {
+            Set-ItemProperty "IIS:\Sites\$siteName" -Name applicationPool -Value '$appPoolName'
+            Set-ItemProperty "IIS:\Sites\$siteName" -Name physicalPath -Value '$sitePath'
+            Set-ItemProperty "IIS:\Sites\$siteName" -Name bindings -Value @{protocol="http";bindingInformation="$ipAddress`:$port`:$hostHeader"}
+            echo "Configuración del sitio $siteName actualizada correctamente."
+            return
+        } catch {
+            echo "Error al actualizar la configuración del sitio $siteName. Verifique los parámetros e intente nuevamente."
+            echo "`$_"
+            return
+        }  
     }
-    # Creamos el sitio IIS
+
+    echo "Creamos el sitio IIS"
     try {
         New-Website -Name '$siteName' -ApplicationPool '$appPoolName' -PhysicalPath '$sitePath' -IPAddress '$ipAddress' -Port '$port' -HostHeader '$hostHeader'
-        Write-Host "Se creó el sitio: $siteName con el Application Pool: $appPoolName"
-    }
-    catch {
-        Write-Host "Error al crear el sitio $siteName. Verifique los parámetros e intente nuevamente."
-        Write-Host "`$_"
+        echo "Se creó el sitio: $siteName con el Application Pool: $appPoolName"
+    } catch {
+        echo "Error al crear el sitio $siteName. Verifique los parámetros e intente nuevamente."
+        echo "`$_"
         return
     }
 } catch {
-    Write-Host "Ocurrió un error: `$_"
+    echo "Ocurrió un error: `$_"
     return
 }
 "@

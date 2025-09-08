@@ -31,38 +31,40 @@ if (-not $ipServer -or -not $sshUser -or -not $appPoolName) {
 
 # Cargamos el script remoto que se ejecutará en el servidor IIS
 $remoteScript = @"
-# Importamos el módulo WebAdministration para gestionar IIS
+echo "Importamos el módulo WebAdministration para gestionar IIS"
 try {
     Import-Module WebAdministration
 }
 catch {
-    Write-Error "Error al importar el módulo WebAdministration."
+    echo "Error al importar el módulo WebAdministration."
     return
 }
 
-# Verificar si el Application Pool ya existe
+echo "Verificar si el Application Pool ya existe..."
 try {
     Get-WebAppPoolState -Name $appPoolName -ErrorAction SilentlyContinue | Out-Null
-    Write-Host "El Application Pool $appPoolName ya existe."
-    # Eliminar el Application Pool si ya existe
-    Remove-WebAppPool -Name $appPoolName -ErrorAction SilentlyContinue
-    Write-Host "Se eliminó el Application Pool existente: $appPoolName"
-}
-catch {
-    Write-Host "No se pudo encontrar el Application Pool $appPoolName."
-}
-
-# Crear el Application Pool
-try {
-    # Si no existe, lo creamos
-    New-WebAppPool -Name $appPoolName | Out-Null
-    Write-Host "Se creó el Application Pool: $appPoolName"
+    echo "El Application Pool $appPoolName ya existe."
+    echo "Seteando configuración del Application Pool existente..."
     Set-ItemProperty "IIS:\AppPools\$appPoolName" -Name "managedRuntimeVersion" -Value '$managedRuntimeVersion'
     Set-ItemProperty "IIS:\AppPools\$appPoolName" -Name "managedPipelineMode" -Value '$managedPipelineMode'
-    Write-Host "Se configuró el Application Pool $appPoolName con la versión de .NET $managedRuntimeVersion y el modo de canalización $managedPipelineMode."
+    echo "Se configuró el Application Pool $appPoolName con la versión de .NET $managedRuntimeVersion y el modo de canalización $managedPipelineMode."
+    return
+}
+catch {
+    echo "No se pudo encontrar el Application Pool $appPoolName."
+}
+
+echo "Crear el Application Pool..."
+try {
+    New-WebAppPool -Name $appPoolName | Out-Null
+    echo "Se creó el Application Pool: $appPoolName"
+    Set-ItemProperty "IIS:\AppPools\$appPoolName" -Name "managedRuntimeVersion" -Value '$managedRuntimeVersion'
+    Set-ItemProperty "IIS:\AppPools\$appPoolName" -Name "managedPipelineMode" -Value '$managedPipelineMode'
+    echo "Se configuró el Application Pool $appPoolName con la versión de .NET $managedRuntimeVersion y el modo de canalización $managedPipelineMode."
+    return
 } catch {
-    Write-Error "Error al crear el Application Pool $appPoolName. Verifique los parámetros e intente nuevamente."
-    Write-Host "`$_"
+    echo "Error al crear el Application Pool $appPoolName. Verifique los parámetros e intente nuevamente."
+    echo "`$_"
     return
 }
 "@
