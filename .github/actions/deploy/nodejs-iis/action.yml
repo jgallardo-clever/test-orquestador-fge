@@ -144,7 +144,7 @@ runs:
 
     - name: Configurar proxy inverso en IIS para Web Application
       if: ${{ inputs.tipo_despliegue == 'webapp' }}
-      uses: ./orquestador/.github/actions/utils/iis-webapp/setup-reverse-proxy
+      uses: ./orquestador/.github/actions/utils/iis-site/setup-reverse-proxy
       with:
         site_name: '${{ inputs.site_name }}/${{ inputs.webapp_name }}'
         target_url: 'http://localhost:${{ inputs.app_port }}'
