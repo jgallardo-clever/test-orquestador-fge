@@ -66,11 +66,9 @@ runs:
         echo "Eliminar proceso pm2..."
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} pm2 stop ${{ inputs.app_name }}
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} pm2 delete ${{ inputs.app_name }}
-        # Revisar el paso de eliminar el directorio de la aplicación
-        # echo "Eliminando directorio de la aplicación..."
-        # ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} rmdir /s /q \"${{ inputs.project_path }}\${{ inputs.app_name }}\"
-        echo "Desplegando aplicación en IIS..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\nodejs\${{ inputs.app_name }}\" \"${{ inputs.project_path }}\"
+
+        echo "Mover archivos del directorio temporal a la ruta del proyecto..."
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} xcopy /y /s /e \"C:\artifacts\nodejs\${{ inputs.app_name }}\" \"${{ inputs.project_path }}\${{ inputs.app_name }}\"
       shell: cmd
 
     - name: Crear App Pool de IIS
