@@ -298,7 +298,7 @@ jobs:
           # Configuración de la aplicación
           app_name: ${{ needs.build.outputs.app_name }}
           start_command: ${{ needs.build.outputs.start_command }}
-          app_port: ${{ secrets.APP_PORT }}
+          app_port: ${{ vars.PORT_APP }}
 
       - name: Deploy Kubernetes
         if: ${{ inputs.tecnologia == 'kubernetes' }}
