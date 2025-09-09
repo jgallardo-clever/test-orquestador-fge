@@ -134,7 +134,7 @@ jobs:
 
       - name: Build Node.js
         id: build_step_node
-        if: ${{ inputs.tecnologia == 'nodejs' && inputs.despliegue_en == 'IIS' }}
+        if: ${{ inputs.tecnologia == 'nodejs'}}
         uses: ./orquestador/.github/actions/build/nodejs-iis
         with:
           server_ip: ${{ secrets.server_ip }}
