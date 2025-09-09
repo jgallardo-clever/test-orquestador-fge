@@ -67,8 +67,8 @@ runs:
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} pm2 stop ${{ inputs.app_name }}
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} pm2 delete ${{ inputs.app_name }}
         # Revisar el paso de eliminar el directorio de la aplicación
-        echo "Eliminando directorio de la aplicación..."
-        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} rmdir /s /q \"${{ inputs.project_path }}\${{ inputs.app_name }}\"
+        # echo "Eliminando directorio de la aplicación..."
+        # ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} rmdir /s /q \"${{ inputs.project_path }}\${{ inputs.app_name }}\"
         echo "Desplegando aplicación en IIS..."
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} move \"C:\artifacts\nodejs\${{ inputs.app_name }}\" \"${{ inputs.project_path }}\"
       shell: cmd
