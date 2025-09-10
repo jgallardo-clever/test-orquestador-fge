@@ -290,7 +290,7 @@ jobs:
           # Configuración IIS
           site_name: ${{ vars.SITE_NAME }}
           webapp_name: ${{ vars.WEBAPP_NAME || '' }}
-          project_path: '${{ secrets.PROJECT_PATH }}'
+          project_path: '${{ vars.PROJECT_PATH }}'
           ip_address: ${{ vars.IP_ADDRESS || '*' }}
           host_header: ${{ vars.HOST_HEADER || 'localhost' }}
           port_site: ${{ vars.PORT_SITE || '80' }}
