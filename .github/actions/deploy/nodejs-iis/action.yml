@@ -66,7 +66,8 @@ runs:
         echo "Eliminar proceso pm2..."
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} pm2 stop ${{ inputs.app_name }}
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} pm2 delete ${{ inputs.app_name }}
-
+        echo "Crear directorio del proyecto si no existe..."
+        ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} if not exist \"${{ inputs.project_path }}\${{ inputs.app_name }}\" mkdir \"${{ inputs.project_path }}\${{ inputs.app_name }}\"
         echo "Mover archivos del directorio temporal a la ruta del proyecto..."
         ssh ${{ inputs.remote_user }}@${{ inputs.server_ip }} xcopy /y /s /e \"C:\artifacts\nodejs\${{ inputs.app_name }}\" \"${{ inputs.project_path }}\${{ inputs.app_name }}\"
       shell: cmd
